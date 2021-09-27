@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPP.CorporatePortal.Web", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPP.CorporatePortal.Common", "EPP.CorporatePortal.Common\EPP.CorporatePortal.Common.csproj", "{FA55181A-51E4-41A0-8DD7-C30CDEBDB093}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sp", "Sp", "{A98A54B1-CCAC-4E7A-961C-7160012B74ED}"
+	ProjectSection(SolutionItems) = preProject
+		D:\Maybank\Source Code\Corporate Portal\Phase5 - ROC\to be correction\Migration\Sprint1\Sprint1.zip = D:\Maybank\Source Code\Corporate Portal\Phase5 - ROC\to be correction\Migration\Sprint1\Sprint1.zip
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
