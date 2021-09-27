@@ -1,0 +1,113 @@
+$(document).ready(function () {
+
+    sameHeight();
+    content_width()
+
+    $(".uploadlogo").change(function () {
+        var filename = readURL(this);
+        $(this).parent().children('span').html(filename);
+    });
+    $('#update-member').on('show.bs.modal', function (e) {
+        $('.uploadlogo').parent().children('span').html('+ Upload now');
+        
+    })
+});
+
+
+window.onresize = function () {
+
+    sameHeight();
+    content_width()
+
+    if (screen.width > 767) {
+
+        menu_open = !menu_open;
+
+        $("div.mobile-menu").hide();
+        $("div.mobile-overlay").hide();
+
+    }
+}
+
+var open = false;
+
+$("#open-sub").click(function () {
+
+    if (open) {
+        $("div.subsidiary-info ").slideDown()
+        $("i.fa-sub").removeClass("fa-chevron-down")
+        $("i.fa-sub").addClass("fa-chevron-up");
+    } else {
+        $("div.subsidiary-info ").slideUp();
+        $("i.fa-sub").addClass("fa-chevron-down")
+        $("i.fa-sub").removeClass("fa-chevron-up");
+    }
+
+    open = !open;
+
+});
+
+function sameHeight() {
+
+    setTimeout(function () { $('.card-col').jQueryEqualHeight(); }, 300);
+
+}
+
+function content_width() {
+
+    // $(".content").width($(window).width() - 110);
+    // $("div.sidenav").height( $("body").height())
+
+    setTimeout(function () {
+        $(".content").width($(window).width() - 110);
+        $("div.sidenav").height($("div.content").height())
+
+    }, 100);
+
+}
+
+function popup_upload() {
+    $('#update-member').modal('show');
+}
+
+
+var menu_open = false;
+
+function open_menu() {
+
+    menu_open = !menu_open;
+
+    if (!menu_open) {
+        $("div.mobile-menu").animate({ width: 'show', left: 0 });
+        $("div.mobile-overlay").show();
+    }
+
+    else {
+        $("div.mobile-menu").animate({ width: 'hide', left: 0 });
+        $("div.mobile-overlay").hide();
+    }
+
+}
+
+
+function readURL(input) {
+
+    var url = input.value;
+    var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+
+    //filter xls type
+    if (input.files && input.files[0] && ((ext == "xls") || (ext == "xlsx")))
+    {
+
+        var path = $(input).val();
+        var filename = path.replace(/^.*\\/, "");
+
+        return "" + filename;
+    }
+
+    else {
+        $(input).val("");
+        return "Only excel(.xls or .xlst) formats are allowed!";
+    }
+
+}

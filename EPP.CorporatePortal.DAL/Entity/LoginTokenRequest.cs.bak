@@ -1,0 +1,35 @@
+﻿namespace EPP.CorporatePortal.DAL.Entity
+
+{
+    public class LoginResponseMessage : BaseEntity
+    {
+        public string Message { get; set; }
+    }
+    public class LoginTokenRequest 
+    {
+        public string AccountCode { get; set; }
+        public string Password { get; set; }
+        public string AppCode { get; set; }
+        public int BusinessEntityID { get; set; }
+        public string UUiD { get; set; }
+    }
+    public class LoginTokenResponse
+    {
+        public ResponseStatusEntity ResponseStatusEntity { get; set; }
+        public bool Valid { get; set; }
+        public string TokenID { get; set; }
+    }
+    public class ResetPasswordTokenRequest
+    {
+        public string AccountCode { get; set; }
+        public string Password { get; set; }
+        public string AppCode { get; set; }
+        public int BusinessEntityID { get; set; }
+        public string NewPassword { get; set; }
+    }
+    public class ResetPasswordTokenResponse
+    {
+        public ResponseStatusEntity ResponseStatusEntity { get; set; }
+        public bool Valid { get; set; }
+    }
+}

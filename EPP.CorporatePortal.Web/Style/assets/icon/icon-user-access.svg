@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="294" height="294" viewBox="0 0 294 294">
+  <g id="Group_58" data-name="Group 58" transform="translate(-3668 975)">
+    <g id="admin_panel_settings-24px" transform="translate(3668 -974.765)">
+      <rect id="Rectangle_6" data-name="Rectangle 6" width="294" height="294" transform="translate(0 -0.235)" fill="none"/>
+      <g id="Group_56" data-name="Group 56" transform="translate(36.721 36.721)">
+        <path id="Path_96" data-name="Path 96" d="M174.363,100.922a81.252,81.252,0,0,1,12.24,1.1V42.985L94.8,3,3,42.985v60.14c0,55.571,39.169,107.592,91.8,120.2a112.194,112.194,0,0,0,19.584-6.732,73.327,73.327,0,0,1,59.977-115.67Z" transform="translate(-3 -3)" fill="none" stroke="#000" stroke-width="1.5"/>
+      </g>
+    </g>
+    <g id="user" transform="translate(3785 -867.344)">
+      <g id="Group_57" data-name="Group 57" transform="translate(0 0)">
+        <path id="Path_97" data-name="Path 97" d="M133.6,22.922A78.261,78.261,0,0,0,22.922,133.6,78.261,78.261,0,0,0,133.6,22.922ZM78.261,147.351a68.933,68.933,0,0,1-51.5-23.084,55.042,55.042,0,0,1,51.5-35.612,27.514,27.514,0,1,1,27.514-27.514A27.514,27.514,0,0,1,78.261,88.655a55.042,55.042,0,0,1,51.5,35.612A68.933,68.933,0,0,1,78.261,147.351Z" transform="translate(0 0)"/>
+      </g>
+    </g>
+  </g>
+</svg>

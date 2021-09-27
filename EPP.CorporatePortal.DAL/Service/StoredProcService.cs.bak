@@ -1,0 +1,1269 @@
+﻿using EPP.CorporatePortal.DAL.EDMX;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static EPP.CorporatePortal.Common.Enums;
+using System.Security.Claims;
+using System.Web;
+ 
+
+
+namespace EPP.CorporatePortal.DAL.Service
+{
+
+   
+    
+    public class StoredProcService
+    {
+        public static AuditTrail auditTrailService { get; set;  }
+        
+        public string UserName { get; set; }
+
+        public   StoredProcService(string userName)
+        {
+            auditTrailService = new AuditTrail();
+
+            UserName = userName;
+
+        }
+
+ 
+         public static SqlConnection conn = new SqlConnection()
+        {
+            ConnectionString= ConfigurationManager.ConnectionStrings["EPPCorporatePortalConnection"].ConnectionString
+        };
+
+        
+
+
+        public DataTable GetCorporateById(string corporateId)
+        {
+            
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.CommandText = "spGetCorporate";
+                cmd.Parameters.Add("@CorporateId", SqlDbType.NVarChar).Value = corporateId;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch(Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetCorporateById. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+
+
+        }
+        public DataTable GetPolicyByCoporateId(string corporateId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetPolicyByCoporateId";
+                cmd.Parameters.Add("@CorporateId", SqlDbType.NVarChar).Value = corporateId;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch(Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetPolicyByCoporateId. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public DataTable GetCorporateSubsidaries(string corporateParentId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetCorporateSubsidaries";
+                cmd.Parameters.Add("@CorporateParentId", SqlDbType.NVarChar).Value = corporateParentId;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetCorporateSubsidaries. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        
+        }
+
+        public DataTable GetMenuRights(int rightId)
+        {
+
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetMenuRights";
+                cmd.Parameters.Add("@RightId", SqlDbType.Int).Value = rightId;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetMenuRights. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+             
+        }
+        public DataTable GetUserRights(string userName)
+        {
+
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetUserRights";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetUserRights. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public List<DataRow> GetMenus(string userName)
+        {
+           
+            var rights = GetUserRights(userName);
+            var menuList = new List<DataRow>();
+            if (rights != null)
+            {
+                try
+                {
+                    foreach (DataRow right in rights.Rows)
+                    {
+                        var menus = GetMenuRights(Convert.ToInt32(right["Id"]));
+                        foreach (DataRow menu in menus.Rows)
+                        {
+
+                            menuList.Add(menu);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetMenus. Error : " + ex.Message, "StoredProcService");
+
+                }
+            }
+            return menuList;
+        }
+
+        public bool IsRightInRole(int rightsID, int roleID)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spIsRightInRole";
+                cmd.Parameters.Add("@RightsId", SqlDbType.Int).Value = rightsID;
+                cmd.Parameters.Add("@RoleID", SqlDbType.Int).Value = roleID;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in IsRightInRole. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt.Rows.Count>0?true:false;
+        }
+        public string GetBusinessRegistrationNo(string corporateName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetBusinessRegistrationNo";
+                cmd.Parameters.Add("@CorporateName", SqlDbType.VarChar).Value = corporateName;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetBusinessRegistrationNo. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt.Rows[0]["BusinessRegistrationNo"].ToString();
+        }
+
+        public DataTable GetAllCorporates()
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetAllCorporates";
+
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetAllCorporates. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public DataTable GetCorporatesByUser(string userName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetCorporatesByUser";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetCorporatesByUser. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+        public DataTable GetPolicyByOwnership(string corporateId, string owner)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetPolicyByOwnership";
+                cmd.Parameters.Add("@CorporateId", SqlDbType.NVarChar).Value = corporateId;
+                cmd.Parameters.Add("@Owner", SqlDbType.VarChar).Value = owner;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetPolicyByOwnership. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public int InsFileUpload(string uploadType,string corpId, string policyId,string fileName, DateTime dateNow,string uploadBy, string mappedFileName,string localPath, string destinationPath, int version, int recordCount)
+        {
+
+            var dt = new DataTable();
+            object val;
+            try
+            {
+                SqlCommand cmd = new SqlCommand();                 
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spInsFileUpload";
+                cmd.Parameters.Add("@UploadType", SqlDbType.VarChar).Value = uploadType;
+                cmd.Parameters.Add("@CorpId", SqlDbType.VarChar).Value = corpId;
+                cmd.Parameters.Add("@PolicyId", SqlDbType.VarChar).Value = policyId;
+                cmd.Parameters.Add("@FileName", SqlDbType.VarChar).Value = fileName;
+                cmd.Parameters.Add("@UploadedDateTime", SqlDbType.DateTime).Value = dateNow;
+                cmd.Parameters.Add("@UploadedBy", SqlDbType.VarChar).Value = uploadBy;
+                cmd.Parameters.Add("@MappedFileName", SqlDbType.VarChar).Value = mappedFileName;
+                cmd.Parameters.Add("@LocalPath", SqlDbType.VarChar).Value = localPath;
+                cmd.Parameters.Add("@DestinationPath", SqlDbType.VarChar).Value = destinationPath;
+                cmd.Parameters.Add("@Version", SqlDbType.Int).Value = version;
+                cmd.Parameters.Add("@RecordCount", SqlDbType.Int).Value = recordCount;
+
+                var outParm = new SqlParameter("@ID", SqlDbType.Int);
+
+                outParm.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(outParm);
+                
+                object obj = cmd.ExecuteNonQuery();
+                val = outParm.Value;
+
+            }
+            catch (Exception ex)
+            {
+                val = 0;
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in InsFileUpload. Error : " + ex.Message, "StoredProcService");
+            }
+            int Id =(int)val;
+             
+            return Id;
+        }
+        public int InsUserUploadFile(string fileName, DateTime dateNow, string uploadBy, byte[] binaryBits)
+        {
+
+            var dt = new DataTable();
+            object val;
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spInsUserUploadFile";
+                cmd.Parameters.Add("@FileName", SqlDbType.VarChar).Value = fileName;
+                cmd.Parameters.Add("@UploadedDateTime", SqlDbType.DateTime).Value = dateNow;
+                cmd.Parameters.Add("@UploadedBy", SqlDbType.VarChar).Value = uploadBy;
+                cmd.Parameters.Add("@BinaryBits", SqlDbType.VarBinary).Value = binaryBits;
+
+                var outParm = new SqlParameter("@ID", SqlDbType.Int);
+
+                outParm.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(outParm);
+
+                object obj = cmd.ExecuteNonQuery();
+                val = outParm.Value;
+
+            }
+            catch (Exception ex)
+            {
+                val = 0;
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in InsUserUploadFile. Error : " + ex.Message, "StoredProcService");
+            }
+            int Id = (int)val;
+
+            return Id;
+        }
+        public int InsUserUpload(string userName, string fullName, string emailAddress, string mobilePhone, string gender, string icNo, string businessRegNo, string status, int id, bool isOwner, string exceptionMessage)
+        {
+
+            var dt = new DataTable();
+            object val;
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spInsUserUpload";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@FullName", SqlDbType.VarChar).Value = fullName;
+                cmd.Parameters.Add("@EmailAddress", SqlDbType.VarChar).Value = emailAddress;
+                cmd.Parameters.Add("@MobilePhone", SqlDbType.VarChar).Value = mobilePhone;
+                cmd.Parameters.Add("@Gender", SqlDbType.VarChar).Value = gender;
+                cmd.Parameters.Add("@ICNo", SqlDbType.VarChar).Value = icNo;
+                cmd.Parameters.Add("@BusinessRegNo", SqlDbType.NVarChar).Value = businessRegNo;
+                cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = status;
+                cmd.Parameters.Add("@FileID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@IsOwner", SqlDbType.Bit).Value = isOwner;
+                cmd.Parameters.Add("@ExceptionMessage", SqlDbType.VarChar).Value = exceptionMessage;
+
+                var outParm = new SqlParameter("@ID", SqlDbType.Int);
+
+                outParm.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(outParm);
+
+                object obj = cmd.ExecuteNonQuery();
+                val = outParm.Value;
+
+            }
+            catch (Exception ex)
+            {
+                val = 0;
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in InsUserUpload. Error : " + ex.Message, "StoredProcService");
+            }
+            int Id = (int)val;
+
+            return Id;
+        }
+        public int InsFileUploadFallout(int fileUploadId,string fallout)
+        {
+
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spInsFileUploadFallout";
+                cmd.Parameters.Add("@FileUploadId", SqlDbType.Int).Value = fileUploadId;
+                cmd.Parameters.Add("@Fallout", SqlDbType.VarChar).Value = fallout;
+                conn.Open();
+                int ID = cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            { 
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in InsFileUploadFallout. Error : " + ex.Message, "StoredProcService");
+            }
+            return 1;
+        }
+        
+        public DataTable GetFileUpload(string corpId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetFileUpload";
+                cmd.Parameters.Add("@CorporateId", SqlDbType.VarChar).Value = corpId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetFileUpload. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public DataTable GetUserUploadFileByUserName(string userName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetUserUploadFileByUserName";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetUserUploadFileByUserName. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public DataTable GetFileUploadFallouts(int fileUploadId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetFileUploadFallouts";
+                cmd.Parameters.Add("@FileUploadId", SqlDbType.Int).Value = fileUploadId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetFileUploadFallouts. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public bool IsUserExist(string userName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spIsUserExist";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in IsUserExist. Error : " + ex.Message, "StoredProcService");
+            }
+
+            return dt.Rows.Count > 0 ? true : false;
+        }
+
+        public DataTable GetUserDetails(string userName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spIsUserExist";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetUserDetails. Error : " + ex.Message, "StoredProcService");
+            }
+
+            return dt;
+        }
+        public void UpdateLastLoginDate(string userName)
+        {
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdLastLoginDate";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateLastLoginDate. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+        public void UpdateUserIsActive(string userName, bool isActive)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdateUserIsActive";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@IsActive", SqlDbType.Bit).Value = isActive;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateUserIsActive. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+        public void UpdateUserIsDelete(string userName, bool isDelete)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdateUserIsDelete";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@IsDelete", SqlDbType.Bit).Value = isDelete;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateUserIsDelete. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+        public void UpdateLastPasswordChangeDate(string userName)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdLastPasswordChangeDate";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateLastPasswordChangeDate. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+        public void UpdateFileUploadStatusByMappedFileName(string MappedFileName, string Status)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdFileUploadStatus";
+                cmd.Parameters.Add("@MappedFileName", SqlDbType.VarChar).Value = MappedFileName;
+                cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = Status;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateFileUploadStatus. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public void UpdateFileUploadStatusByID(int ID, string Status)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdFileUploadStatusByID";
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
+                cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = Status;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateFileUploadStatusByID. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public DataTable GetPolicyDetails(string policyId, string corporateId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetPolicyDetails";
+                cmd.Parameters.Add("@PolicySourceId", SqlDbType.VarChar).Value = policyId;
+                cmd.Parameters.Add("@CorpSourceId", SqlDbType.VarChar).Value = corporateId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetPolicyDetails. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+
+        }
+
+        public DataTable GetPolicyProduct(string policyId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetPolicyProduct";
+                cmd.Parameters.Add("@PolicySourceId", SqlDbType.VarChar).Value = policyId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetPolicyProduct. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+
+        }
+
+        public void UpdateLastLoginAttempt(string userName, bool reinitiate)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdateLastLoginAttempt";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@Reinitiate", SqlDbType.Int).Value = reinitiate == false ? 0 : 1;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateLastLoginAttempt. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public void ProcessCreateUser(string userName, string fullName, string corpId, bool isOwner)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spProcessCreateUser";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@FullName", SqlDbType.VarChar).Value = fullName;
+                cmd.Parameters.Add("@BusinessRegNo", SqlDbType.VarChar).Value = corpId;
+                cmd.Parameters.Add("@IsOwner", SqlDbType.Bit).Value = isOwner;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in ProcessCreateUser. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public DataTable GetInsuredGroupSubsidaries(string corporateId,string userName,string policyId,bool IsOwner)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetInsuredGroupSubsidaries";
+                cmd.Parameters.Add("@CorpId", SqlDbType.VarChar).Value = corporateId;
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@PolicyId", SqlDbType.VarChar).Value = policyId;
+                cmd.Parameters.Add("@IsOwner", SqlDbType.Bit).Value = IsOwner;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetInsuredGroupSubsidaries. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+
+        }
+        public string GetCorporateByUserName(string userName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetCorporateByUserName";
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetCorporateByUserName. Error : " + ex.Message, "StoredProcService");
+            }
+
+            return dt.Rows[0]["SourceId"].ToString(); ;
+        }
+        public int InsAuditTrail(DateTime date,string type, string userName, string description , string menu)
+        {
+
+            var dt = new DataTable();
+            object val;
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spInsAuditTrail";
+                cmd.Parameters.Add("@Date", SqlDbType.DateTime).Value = date;
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+                cmd.Parameters.Add("@Type", SqlDbType.VarChar).Value = type;
+                cmd.Parameters.Add("@Description", SqlDbType.VarChar).Value = description;
+                cmd.Parameters.Add("@Menu", SqlDbType.VarChar).Value = menu;
+
+                var outParm = new SqlParameter("@ID", SqlDbType.Int);
+
+                outParm.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(outParm);
+
+                object obj = cmd.ExecuteNonQuery();
+                val = outParm.Value;
+            }
+            catch (Exception ex)
+            {
+                val = 0;
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetCorporateByUserName. Error : " + ex.Message, "StoredProcService");
+            }
+            int Id = (int)val;
+
+            return Id;
+        }
+        public DataTable GetFileUploadMandatoryColumn(string product)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetFileUploadMandatoryColumn";
+                cmd.Parameters.Add("@Product", SqlDbType.VarChar).Value = product;
+               
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetFileUploadMapping. Error : " + ex.Message, "StoredProcService");
+            }
+
+             
+            return dt;
+        }
+
+        public DataTable GetFileUploadMappingColumns()
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetFileUploadMappingColumn";
+              
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetFileUploadMappingColumns. Error : " + ex.Message, "StoredProcService");
+            }
+            
+
+            return dt;
+        }
+
+        public bool IsFileUploadExist(string FileName, string ROC, string ContractNo, int Version)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spIsFileUploadExist";
+                cmd.Parameters.Add("@FileName", SqlDbType.VarChar).Value = FileName;
+                cmd.Parameters.Add("@ROC", SqlDbType.VarChar).Value = ROC;
+                cmd.Parameters.Add("@ContractNo", SqlDbType.VarChar).Value = ContractNo;
+                cmd.Parameters.Add("@Version", SqlDbType.Int).Value = Version;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in IsFileUploadExist. Error : " + ex.Message, "StoredProcService");
+            }
+
+            return dt.Rows.Count > 0 ? true : false;
+        }
+
+        public bool IsCorporateExist(string CorpID)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetCorporate";
+                cmd.Parameters.Add("@CorporateId", SqlDbType.VarChar).Value = CorpID;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in IsCorporateExist. Error : " + ex.Message, "StoredProcService");
+            }
+
+            return dt.Rows.Count > 0 ? true : false;
+        }
+
+        public bool IsUserUploadFileExist(string fileName, string userName)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spIsFileUploadExist";
+                cmd.Parameters.Add("@FileName", SqlDbType.VarChar).Value = fileName;
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar).Value = userName;
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in IsUserUploadFileExist. Error : " + ex.Message, "StoredProcService");
+            }
+
+            return dt.Rows.Count > 0 ? true : false;
+        }
+
+        public void UpdateFileUploadLinks(int ID, string RPAExceptionLink, string CGLSExceptionLink, string InvoiceLink, string ExceptionLink)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdFileUploadLinks";
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
+                cmd.Parameters.Add("@RPAExceptionLink", SqlDbType.VarChar).Value = RPAExceptionLink;
+                cmd.Parameters.Add("@CGLSExceptionLink", SqlDbType.VarChar).Value = CGLSExceptionLink;
+                cmd.Parameters.Add("@InvoiceLink", SqlDbType.VarChar).Value = InvoiceLink;
+                cmd.Parameters.Add("@ExceptionLink", SqlDbType.VarChar).Value = ExceptionLink;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateFileUploadLinks. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public void UpdateFileUploadBinary(int id, byte[] fileBytes, string fileType)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdFileUploadBinary";
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@BinaryBits", SqlDbType.VarBinary).Value = fileBytes;
+                cmd.Parameters.Add("@FileType", SqlDbType.VarChar).Value = fileType;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateFileUploadBinary. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public void UpdateUserUploadStatus(int id, string exceptionMessage, string status)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdUserUploadStatus";
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                cmd.Parameters.Add("@ExceptionMessage", SqlDbType.VarChar).Value = exceptionMessage;
+                cmd.Parameters.Add("@Status", SqlDbType.VarChar).Value = status;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateUserUploadStatus. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public void UpdateUserUploadFileExceptionStatus(int id, byte[] fileBinary, string status, string approvedBy)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spUpdUserUploadFileException";
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                if (fileBinary != null)
+                    cmd.Parameters.Add("@BinaryBits", SqlDbType.VarBinary).Value = fileBinary;
+                cmd.Parameters.Add("@Status", SqlDbType.VarChar).Value = status;
+                cmd.Parameters.Add("@ApprovedBy", SqlDbType.VarChar).Value = approvedBy;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in UpdateUserUploadFileExceptionStatus. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public void RemoveUserUploadFile(int id)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                if (cmd.Connection.State == ConnectionState.Closed)
+                {
+                    cmd.Connection.Open();
+                }
+                else
+                {
+                    cmd.Connection.Close();
+                    conn.Open();
+                }
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spRemoveUserUploadFile";
+                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in RemoveUserUploadFile. Error : " + ex.Message, "StoredProcService");
+            }
+        }
+
+        public DataTable GetUserUploadByFileId(int fileUploadId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetUserUploadByFileId";
+                cmd.Parameters.Add("@FileUploadId", SqlDbType.Int).Value = fileUploadId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetUserUploadByFileId. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public DataTable GetUserUploadFileById(int fileUploadId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetUserUploadFileById";
+                cmd.Parameters.Add("@FileUploadId", SqlDbType.Int).Value = fileUploadId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetUserUploadFileById. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
+        public DataTable GetFileUploadById(int fileUploadId)
+        {
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "spGetFileUploadById";
+                cmd.Parameters.Add("@FileUploadId", SqlDbType.Int).Value = fileUploadId;
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetFileUploadById. Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+    }
+}

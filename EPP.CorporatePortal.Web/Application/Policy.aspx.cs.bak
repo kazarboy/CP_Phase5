@@ -1,0 +1,91 @@
+﻿
+using EPP.CorporatePortal.Common;
+using EPP.CorporatePortal.DAL.Service;
+using System;
+using System.Data;
+using System.Linq;
+using System.Security.Claims;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using EPP.CorporatePortal.Models;
+
+namespace EPP.CorporatePortal.Application
+{
+
+    public partial class Policy : System.Web.UI.Page
+    {
+        public AuditTrail auditTrailService = new AuditTrail();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            var identity = (System.Security.Claims.ClaimsIdentity)Context.User.Identity;
+            var userName = identity.Claims.Where(c => c.Type == ClaimTypes.Upn).Select(c => c.Value).SingleOrDefault();
+            //if (!Page.IsPostBack)
+            //{
+            DataTable policies = new DataTable();
+            var newCorpId = Request.QueryString["CorpId"] ?? "0";
+            //var newCorpIdInt = Convert.ToInt32(newCorpId);
+            if (newCorpId != "" && newCorpId != "0")
+            {
+                hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                policies = CommonEntities.LoadPolicies(newCorpId, identity);
+            }
+            else
+            {                
+                //var bizRegNo = identity.Claims.Where(c => c.Type == "ParentBizRegNo").Select(c => c.Value).SingleOrDefault();
+                var bizRegNo = new StoredProcService(userName).GetCorporateByUserName(userName);
+                var corporateID = new CorporateService().GetParentId(bizRegNo);
+                hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(bizRegNo);
+                policies = CommonEntities.LoadPolicies(bizRegNo, identity);                
+            }
+            rptPolicies.DataSource = policies;
+            rptPolicies.DataBind();
+            SetPageDetails();
+            //}
+        }
+
+        private void SetPageDetails()
+        {
+            var accessPermission = Rights_Enum.ManagePolicy;
+            HiddenField hdnPermission = (HiddenField)Page.Master.FindControl("hdnPermission");
+            hdnPermission.Value = Enum.GetName(typeof(Rights_Enum), accessPermission);
+
+            var identity = (System.Security.Claims.ClaimsIdentity)Context.User.Identity;
+            var roles = identity.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).FirstOrDefault();
+            var userName = identity.Claims.Where(c => c.Type == ClaimTypes.Upn).Select(c => c.Value).SingleOrDefault();
+            HiddenField hdnHomePage = (HiddenField)Page.Master.FindControl("hdnHomePage");
+            hdnHomePage.Value = Utility.GetHomePageByRole(userName);
+        }
+
+        protected static string GetStatus(object dataItem)
+        {
+            string value = DataBinder.Eval(dataItem,"Status").ToString();
+            if (value.ToLower()=="true")            
+                return Resources.Resource.Active;            
+            else            
+                return Resources.Resource.Inactive;
+        }
+        protected void rptPolicies_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            Repeater rptPolicies = sender as Repeater; // Get the Repeater control object.
+
+            // If the Repeater contains no data.
+            if (rptPolicies != null && rptPolicies.Items.Count < 1)
+            {
+                if (e.Item.ItemType == ListItemType.Footer)
+                {
+                    // Show the Error Label (if no data is present).
+                    Label lblEmptyMsg = e.Item.FindControl("lblEmptyMsg") as Label;
+                    if (lblEmptyMsg != null)
+                    {
+                        lblEmptyMsg.Visible = true;
+                    }
+                }
+            }
+
+           
+        }
+
+
+       
+    }
+}

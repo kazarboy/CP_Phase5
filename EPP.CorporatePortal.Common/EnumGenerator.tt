@@ -1,0 +1,132 @@
+﻿<#@ assembly name="System.Configuration" #>
+<#@ assembly name="System.Data" #>
+<#@ import namespace="System.Configuration" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Text" #>
+
+
+<#@ template language="C#" debug="true" hostspecific="true"#>
+<#@ include file="EF.Utility.CS.ttinclude"#>
+<#@ import namespace="System.Data.SqlClient" #> 
+<#
+/*
+ * Developer : Suraysen
+ * Date : 15/11/2019
+ * All code (c)2019 Etiqa, all rights reserved
+ */
+ ///////////////////////TEMPLATE PARAMETES////////////////////////////////////
+//Database connection string
+var configFilePath = "\app.config";
+var connectionString = this.GetConnectionString(configFilePath, "EPPCorporatePortalConnection");
+
+//Enum value column name:
+var enumDescriptionColumnName = "Name";
+var enumDescriptionPrimaryColumnName="Id";
+var enumDescriptionColumnName2 = "Name";
+var enumDescriptionPrimaryColumnName2="Id";
+
+//Enum namespace
+var enumNameSpace = "EPP.CorporatePortal.Common";
+
+var fileManager = EntityFrameworkTemplateFileManager.Create(this);
+var codeGenerationTools = new CodeGenerationTools(this);
+//Open ADO connection
+var connection = new SqlConnection(connectionString);
+var command = connection.CreateCommand();
+connection.Open();
+
+command.CommandText = string.Format(@"SELECT DISTINCT t.NAME 
+									FROM SYS.tables as t
+									INNER JOIN SYS.columns AS c ON t.object_id = c.object_id
+									AND t.NAME IN('Role','Rights') ORDER BY t.NAME");
+var tableReader = command.ExecuteReader();
+var enumTables = new List<string>();
+while (tableReader.Read())
+{
+	enumTables.Add(tableReader["NAME"].ToString());
+}
+connection.Close();
+
+foreach (var tableName in enumTables)
+{
+	connection.Open();
+	
+	//Get the enum name
+	var enumName = ConvertCaseString(tableName);
+	fileManager.StartNewFile(enumName + "Enum.cs");
+
+//Start write enum file:		
+#>
+namespace <#=enumNameSpace#>
+{
+	public enum <#=tableName#>_Enum
+	{
+	<#
+    if (tableName=="Role"){
+	    command.CommandText = string.Format("SELECT * FROM {0} Where IsActive=1 ORDER BY Name",codeGenerationTools.Escape(tableName));
+    }
+    else{
+	    command.CommandText = string.Format("SELECT * FROM {0} ORDER BY NAME",codeGenerationTools.Escape(tableName));
+    }
+    var columnReader = command.ExecuteReader();
+    while (columnReader.Read())
+    {
+		//Fill only the values that the field "enumDescriptionColumnName" have value
+		if( tableName=="aspnet_Roles")
+		{
+	#> <#=columnReader[enumDescriptionColumnName2].ToString()#> = <#=columnReader[enumDescriptionPrimaryColumnName2].ToString()#>,
+	<#	}
+        else if(!string.IsNullOrEmpty(columnReader[enumDescriptionColumnName].ToString().Trim()) && tableName=="aspnet_Rights")
+		{
+	#> <#=columnReader[enumDescriptionColumnName].ToString()#> = <#=columnReader[enumDescriptionPrimaryColumnName].ToString()#>,
+	<#	}
+		else if(tableName!="aspnet_Roles")
+		{
+	#>	<#=columnReader[enumDescriptionColumnName].ToString()#> = <#=columnReader[0].ToString()#>,
+	<#	}
+	}#>
+}
+}
+<#
+	connection.Close();
+	
+}
+	fileManager.Process();
+#>
+
+<#+
+		/// <summary>
+        /// Converts the phrase to specified convention.
+        /// </summary>
+        /// <param name="phrase"></param>
+        /// <param name="cases">The cases.</param>
+        /// <returns>string</returns>
+        public static string ConvertCaseString(string phrase)
+        {
+            phrase = phrase.ToLower().Replace("_", " ");
+            string[] splittedPhrase = phrase.Split(' ', '-', '.');
+            var sb = new StringBuilder();
+
+            sb = new StringBuilder();
+
+            foreach (String s in splittedPhrase)
+            {
+                char[] splittedPhraseChars = s.ToCharArray();
+                if (splittedPhraseChars.Length > 0)
+                {
+                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpper().ToCharArray())[0];
+                }
+                sb.Append(new String(splittedPhraseChars));
+            }
+            return sb.ToString();
+        }
+
+        private string GetConnectionString(string configFilePath, string key)
+        {
+			 
+            var connectionString = "Data source=172.31.20.207;initial catalog=EPPCorporatePortal;persist security info=True;user id=epspartnerportaluser;password=Pa$$w0rd;";
+ 
+            return connectionString;
+        }
+#>

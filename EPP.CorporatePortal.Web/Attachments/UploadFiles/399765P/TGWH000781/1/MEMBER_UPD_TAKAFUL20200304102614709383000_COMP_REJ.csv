@@ -1,0 +1,8 @@
+Record No.,Key Indicator,Error Type,Message
+1,610609085058,Functional Error,Member is existing to the Policy. Cannot attach the member to the Policy again with same relationship.
+2,591225085357.00,Functional Error,Plan is not eligible  for  Scheme: SCH-005930 Product: TMW Plan: TMW2
+2,5.91225E+11,Functional Error,Member with New IC Number 591225085357 cannot be rejoined to policy TTMW000120 as TPD/CI Claim registered against the member is fully paid
+3,K911475,Functional Error,Plan is not eligible  for  Scheme: SCH-005930 Product: TMW Plan: TMW1
+3,K911475,Functional Error,Member with IC Number K911475 cannot rejoined to policy TTMW000120 as member is already attached to policy
+4,9.11231E+11,Functional Error,Plan is not eligible  for  Scheme: SCH-005930 Product: TMW Plan: TMW1
+4,9.11231E+11,Functional Error,Member with New IC Number 911231085185 cannot be rejoined to policy TTMW000120 as member is already attached to policy

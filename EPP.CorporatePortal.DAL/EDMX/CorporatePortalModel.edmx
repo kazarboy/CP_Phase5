@@ -1,0 +1,988 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="EPPCorporatePortalModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'EPPCorporatePortal_P5.dbo.AuditTrail' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="AuditTrail">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Date" />
+            <PropertyRef Name="Users" />
+            <PropertyRef Name="Description" />
+            <PropertyRef Name="Menu" />
+            <PropertyRef Name="UserIPAddress" />
+          </Key>
+          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="Users" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="UserIPAddress" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Menu" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="Corporate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SourceId" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="255" />
+          <Property Name="Description" Type="varchar" MaxLength="255" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="ParentId" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="AddressLine1" Type="nvarchar" MaxLength="100" />
+          <Property Name="AddressLine2" Type="nvarchar" MaxLength="100" />
+          <Property Name="AddressLine3" Type="nvarchar" MaxLength="100" />
+          <Property Name="AddressLine4" Type="nvarchar" MaxLength="100" />
+          <Property Name="City" Type="nvarchar" MaxLength="50" />
+          <Property Name="ZipCode" Type="nvarchar" MaxLength="5" />
+          <Property Name="State" Type="nvarchar" MaxLength="50" />
+          <Property Name="Country" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="CorporatePolicy">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CorporateSourceId" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="PolicySourceId" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="PersonInCharge" Type="varchar" MaxLength="50" />
+          <Property Name="Status" Type="nvarchar" MaxLength="10" />
+          <Property Name="InsuredNo" Type="int" />
+          <Property Name="AccountNo" Type="nvarchar" MaxLength="20" />
+          <Property Name="InsurableInterest" Type="nvarchar" MaxLength="255" />
+          <Property Name="CorpId" Type="int" />
+        </EntityType>
+        <EntityType Name="CorporatePolicyDetails">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CorporatePolicyId" Type="int" Nullable="false" />
+          <Property Name="EffectiveFrom" Type="datetime" />
+          <Property Name="EffectiveTo" Type="datetime" />
+          <Property Name="MarketingStaff" Type="nvarchar" MaxLength="200" />
+          <Property Name="BankBranchName" Type="nvarchar" MaxLength="100" />
+          <Property Name="BankAccountNo" Type="nvarchar" MaxLength="20" />
+          <Property Name="AddressLine1" Type="nvarchar" MaxLength="100" />
+          <Property Name="AddressLine2" Type="nvarchar" MaxLength="100" />
+          <Property Name="AddressLine3" Type="nvarchar" MaxLength="100" />
+          <Property Name="AddressLine4" Type="nvarchar" MaxLength="100" />
+          <Property Name="City" Type="nvarchar" MaxLength="50" />
+          <Property Name="ZipCode" Type="nvarchar" MaxLength="5" />
+          <Property Name="State" Type="nvarchar" MaxLength="50" />
+          <Property Name="Country" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="CorporateUsers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CorporateSourceId" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="IsOwner" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FileUpload">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UploadType" Type="varchar" MaxLength="50" />
+          <Property Name="CorporateId" Type="nvarchar" MaxLength="30" />
+          <Property Name="FileName" Type="varchar" MaxLength="50" />
+          <Property Name="UploadedDateTime" Type="datetime" />
+          <Property Name="UploadedBy" Type="varchar" MaxLength="50" />
+          <Property Name="MappedFileName" Type="varchar" MaxLength="50" />
+          <Property Name="LocalPath" Type="varchar" MaxLength="255" />
+          <Property Name="DestinationPath" Type="varchar" MaxLength="255" />
+          <Property Name="Status" Type="nvarchar" MaxLength="15" />
+          <Property Name="CorporateSourceId" Type="nvarchar" MaxLength="30" />
+          <Property Name="PolicySourceId" Type="nvarchar" MaxLength="30" />
+          <Property Name="InvoiceDate" Type="datetime" />
+          <Property Name="ContributionAmt" Type="float" />
+          <Property Name="InvoiceStatus" Type="nvarchar" MaxLength="20" />
+          <Property Name="InvoiceNo" Type="nvarchar" MaxLength="20" />
+          <Property Name="PolicyVersion" Type="int" />
+          <Property Name="RPAExceptionLink" Type="varchar" MaxLength="255" />
+          <Property Name="CGLSExceptionLink" Type="varchar" MaxLength="255" />
+          <Property Name="InvoiceLink" Type="varchar" MaxLength="255" />
+          <Property Name="ExceptionLink" Type="varchar" MaxLength="255" />
+          <Property Name="RecordCount" Type="int" />
+          <Property Name="InvoiceFile" Type="varbinary(max)" />
+          <Property Name="ExceptionFile" Type="varbinary(max)" />
+          <Property Name="UploadedFile" Type="varbinary(max)" />
+          <Property Name="MappedRPAFile" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="FileUploadFallout_remove">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FileUploadId" Type="int" />
+          <Property Name="Fallout" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="Menu">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ActionMenuPath" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="ParentMenu" Type="int" />
+          <Property Name="ImagePlaceHolder" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="MenuRights">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="MenuId" Type="int" Nullable="false" />
+          <Property Name="RightsId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Policy">
+          <Key>
+            <PropertyRef Name="SourceId" />
+          </Key>
+          <Property Name="SourceId" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="ProductName" Type="varchar" MaxLength="50" />
+          <Property Name="ContractNo" Type="varchar" MaxLength="255" />
+          <Property Name="ContractHolder" Type="varchar" MaxLength="255" />
+          <Property Name="PeriodOfCoverStart" Type="datetime" />
+          <Property Name="PeriodOfCoverEnd" Type="datetime" />
+          <Property Name="Renewal" Type="datetime" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" />
+          <Property Name="AgentCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="Version" Type="int" />
+          <Property Name="ProductCode" Type="nvarchar" MaxLength="10" />
+          <Property Name="Entity" Type="nvarchar" MaxLength="5" />
+        </EntityType>
+        <EntityType Name="Rights">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" />
+          <Property Name="Description" Type="varchar" MaxLength="50" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Role">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="50" />
+          <Property Name="HomePageUrl" Type="varchar" MaxLength="50" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RoleRight">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RoleId" Type="int" />
+          <Property Name="RightId" Type="int" />
+        </EntityType>
+        <EntityType Name="SystemConfig">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Setting" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Value" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="Maintainable" Type="bit" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SourceId" Type="nvarchar" MaxLength="30" />
+          <Property Name="UserName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="FullName" Type="varchar" MaxLength="255" />
+          <Property Name="LastLoginDate" Type="datetime" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="LoginAttempt" Type="int" />
+          <Property Name="LastAttemptDate" Type="datetime" />
+          <Property Name="IsDelete" Type="bit" />
+          <Property Name="LastPasswordChangeDate" Type="datetime" />
+          <Property Name="EmailAddress" Type="varchar" MaxLength="255" />
+          <Property Name="MobilePhone" Type="varchar" MaxLength="50" />
+          <Property Name="Gender" Type="varchar" MaxLength="10" />
+          <Property Name="ICNo" Type="varchar" MaxLength="30" />
+          <Property Name="OTPCode" Type="nvarchar" MaxLength="10" />
+          <Property Name="GenOTPCode" Type="datetime" />
+        </EntityType>
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SourceId" Type="nvarchar" MaxLength="30" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="RoleId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK_CorporateUsers_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="CorporateUsers" Type="Self.CorporateUsers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="CorporateUsers">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FileUploadFallout_FileUpload">
+          <End Role="FileUpload" Type="Self.FileUpload" Multiplicity="0..1" />
+          <End Role="FileUploadFallout_remove" Type="Self.FileUploadFallout_remove" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FileUpload">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FileUploadFallout_remove">
+              <PropertyRef Name="FileUploadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MenuRights_Menu">
+          <End Role="Menu" Type="Self.Menu" Multiplicity="1" />
+          <End Role="MenuRights" Type="Self.MenuRights" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Menu">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MenuRights">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MenuRights_Rights">
+          <End Role="Rights" Type="Self.Rights" Multiplicity="1" />
+          <End Role="MenuRights" Type="Self.MenuRights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Rights">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MenuRights">
+              <PropertyRef Name="RightsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRole_Role">
+          <End Role="Role" Type="Self.Role" Multiplicity="1" />
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Role">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserRole">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRole_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserRole">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="EPPCorporatePortalModelStoreContainer">
+          <EntitySet Name="Corporate" EntityType="Self.Corporate" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CorporatePolicy" EntityType="Self.CorporatePolicy" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CorporatePolicyDetails" EntityType="Self.CorporatePolicyDetails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CorporateUsers" EntityType="Self.CorporateUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FileUpload" EntityType="Self.FileUpload" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FileUploadFallout_remove" EntityType="Self.FileUploadFallout_remove" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Menu" EntityType="Self.Menu" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MenuRights" EntityType="Self.MenuRights" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Policy" EntityType="Self.Policy" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Rights" EntityType="Self.Rights" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Role" EntityType="Self.Role" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RoleRight" EntityType="Self.RoleRight" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SystemConfig" EntityType="Self.SystemConfig" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserRole" EntityType="Self.UserRole" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserType" EntityType="Self.UserType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AuditTrail" EntityType="Self.AuditTrail" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [AuditTrail].[Id] AS [Id], 
+    [AuditTrail].[Date] AS [Date], 
+    [AuditTrail].[Users] AS [Users], 
+    [AuditTrail].[Description] AS [Description], 
+    [AuditTrail].[UserIPAddress] AS [UserIPAddress], 
+    [AuditTrail].[Menu] AS [Menu], 
+    [AuditTrail].[Type] AS [Type]
+    FROM [dbo].[AuditTrail] AS [AuditTrail]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_CorporateUsers_User" Association="Self.FK_CorporateUsers_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="CorporateUsers" EntitySet="CorporateUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FileUploadFallout_FileUpload" Association="Self.FK_FileUploadFallout_FileUpload">
+            <End Role="FileUpload" EntitySet="FileUpload" />
+            <End Role="FileUploadFallout_remove" EntitySet="FileUploadFallout_remove" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuRights_Menu" Association="Self.FK_MenuRights_Menu">
+            <End Role="Menu" EntitySet="Menu" />
+            <End Role="MenuRights" EntitySet="MenuRights" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuRights_Rights" Association="Self.FK_MenuRights_Rights">
+            <End Role="Rights" EntitySet="Rights" />
+            <End Role="MenuRights" EntitySet="MenuRights" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRole_Role" Association="Self.FK_UserRole_Role">
+            <End Role="Role" EntitySet="Role" />
+            <End Role="UserRole" EntitySet="UserRole" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRole_User" Association="Self.FK_UserRole_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="UserRole" EntitySet="UserRole" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EPPCorporatePortalModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="EPPCorporatePortalEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CorporatePolicies" EntityType="EPPCorporatePortalModel.CorporatePolicy" />
+          <EntitySet Name="CorporatePolicyDetails" EntityType="EPPCorporatePortalModel.CorporatePolicyDetail" />
+          <EntitySet Name="CorporateUsers" EntityType="EPPCorporatePortalModel.CorporateUser" />
+          <EntitySet Name="Menus" EntityType="EPPCorporatePortalModel.Menu" />
+          <EntitySet Name="MenuRights" EntityType="EPPCorporatePortalModel.MenuRight" />
+          <EntitySet Name="Policies" EntityType="EPPCorporatePortalModel.Policy" />
+          <EntitySet Name="Rights" EntityType="EPPCorporatePortalModel.Right" />
+          <EntitySet Name="Roles" EntityType="EPPCorporatePortalModel.Role" />
+          <EntitySet Name="RoleRights" EntityType="EPPCorporatePortalModel.RoleRight" />
+          <EntitySet Name="UserRoles" EntityType="EPPCorporatePortalModel.UserRole" />
+          <EntitySet Name="UserTypes" EntityType="EPPCorporatePortalModel.UserType" />
+          <EntitySet Name="AuditTrails" EntityType="EPPCorporatePortalModel.AuditTrail" />
+          <AssociationSet Name="FK_MenuRights_Menu" Association="EPPCorporatePortalModel.FK_MenuRights_Menu">
+            <End Role="Menu" EntitySet="Menus" />
+            <End Role="MenuRight" EntitySet="MenuRights" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuRights_Rights" Association="EPPCorporatePortalModel.FK_MenuRights_Rights">
+            <End Role="Right" EntitySet="Rights" />
+            <End Role="MenuRight" EntitySet="MenuRights" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRole_Role" Association="EPPCorporatePortalModel.FK_UserRole_Role">
+            <End Role="Role" EntitySet="Roles" />
+            <End Role="UserRole" EntitySet="UserRoles" />
+          </AssociationSet>
+          <EntitySet Name="SystemConfigs" EntityType="EPPCorporatePortalModel.SystemConfig" />
+          <EntitySet Name="FileUploads" EntityType="EPPCorporatePortalModel.FileUpload" />
+          <EntitySet Name="FileUploadFallout_remove" EntityType="EPPCorporatePortalModel.FileUploadFallout_remove" />
+          <AssociationSet Name="FK_FileUploadFallout_FileUpload" Association="EPPCorporatePortalModel.FK_FileUploadFallout_FileUpload">
+            <End Role="FileUpload" EntitySet="FileUploads" />
+            <End Role="FileUploadFallout_remove" EntitySet="FileUploadFallout_remove" />
+          </AssociationSet>
+          <EntitySet Name="Users" EntityType="EPPCorporatePortalModel.User" />
+          <AssociationSet Name="FK_CorporateUsers_User" Association="EPPCorporatePortalModel.FK_CorporateUsers_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="CorporateUser" EntitySet="CorporateUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRole_User" Association="EPPCorporatePortalModel.FK_UserRole_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="UserRole" EntitySet="UserRoles" />
+          </AssociationSet>
+          <EntitySet Name="Corporates" EntityType="EPPCorporatePortalModel.Corporate" />
+        </EntityContainer>
+        <EntityType Name="CorporatePolicy">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CorporateSourceId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="PolicySourceId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="PersonInCharge" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="InsuredNo" Type="Int32" />
+          <Property Name="AccountNo" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="InsurableInterest" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CorpId" Type="Int32" />
+        </EntityType>
+        <EntityType Name="CorporatePolicyDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CorporatePolicyId" Type="Int32" Nullable="false" />
+          <Property Name="EffectiveFrom" Type="DateTime" Precision="3" />
+          <Property Name="EffectiveTo" Type="DateTime" Precision="3" />
+          <Property Name="MarketingStaff" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="BankBranchName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="BankAccountNo" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine1" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine2" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine3" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine4" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ZipCode" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="State" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CorporateUser">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CorporateSourceId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="IsOwner" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="EPPCorporatePortalModel.FK_CorporateUsers_User" FromRole="CorporateUser" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Menu">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ActionMenuPath" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ParentMenu" Type="Int32" />
+          <Property Name="ImagePlaceHolder" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="MenuRight" Relationship="EPPCorporatePortalModel.FK_MenuRights_Menu" FromRole="Menu" ToRole="MenuRight" />
+        </EntityType>
+        <EntityType Name="MenuRight">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="MenuId" Type="Int32" Nullable="false" />
+          <Property Name="RightsId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Menu" Relationship="EPPCorporatePortalModel.FK_MenuRights_Menu" FromRole="MenuRight" ToRole="Menu" />
+          <NavigationProperty Name="Right" Relationship="EPPCorporatePortalModel.FK_MenuRights_Rights" FromRole="MenuRight" ToRole="Right" />
+        </EntityType>
+        <EntityType Name="Policy">
+          <Key>
+            <PropertyRef Name="SourceId" />
+          </Key>
+          <Property Name="SourceId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="ProductName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ContractNo" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ContractHolder" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="PeriodOfCoverStart" Type="DateTime" Precision="3" />
+          <Property Name="PeriodOfCoverEnd" Type="DateTime" Precision="3" />
+          <Property Name="Renewal" Type="DateTime" Precision="3" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="AgentCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Version" Type="Int32" />
+          <Property Name="ProductCode" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Entity" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Right">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="MenuRights" Relationship="EPPCorporatePortalModel.FK_MenuRights_Rights" FromRole="Right" ToRole="MenuRight" />
+        </EntityType>
+        <EntityType Name="Role">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="HomePageUrl" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="UserRoles" Relationship="EPPCorporatePortalModel.FK_UserRole_Role" FromRole="Role" ToRole="UserRole" />
+        </EntityType>
+        <EntityType Name="RoleRight">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoleId" Type="Int32" />
+          <Property Name="RightId" Type="Int32" />
+        </EntityType>
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SourceId" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="RoleId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Role" Relationship="EPPCorporatePortalModel.FK_UserRole_Role" FromRole="UserRole" ToRole="Role" />
+          <NavigationProperty Name="User" Relationship="EPPCorporatePortalModel.FK_UserRole_User" FromRole="UserRole" ToRole="User" />
+        </EntityType>
+        <EntityType Name="UserType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="AuditTrail">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Date" />
+            <PropertyRef Name="Users" />
+            <PropertyRef Name="Description" />
+            <PropertyRef Name="UserIPAddress" />
+            <PropertyRef Name="Menu" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Users" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="UserIPAddress" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Menu" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Type" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_MenuRights_Menu">
+          <End Type="EPPCorporatePortalModel.Menu" Role="Menu" Multiplicity="1" />
+          <End Type="EPPCorporatePortalModel.MenuRight" Role="MenuRight" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Menu">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MenuRight">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MenuRights_Rights">
+          <End Type="EPPCorporatePortalModel.Right" Role="Right" Multiplicity="1" />
+          <End Type="EPPCorporatePortalModel.MenuRight" Role="MenuRight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Right">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MenuRight">
+              <PropertyRef Name="RightsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRole_Role">
+          <End Type="EPPCorporatePortalModel.Role" Role="Role" Multiplicity="1" />
+          <End Type="EPPCorporatePortalModel.UserRole" Role="UserRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Role">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserRole">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="SystemConfig">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Setting" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Value" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Maintainable" Type="Boolean" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="FileUpload">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UploadType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CorporateId" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="FileName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UploadedDateTime" Type="DateTime" Precision="3" />
+          <Property Name="UploadedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MappedFileName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LocalPath" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="DestinationPath" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="CorporateSourceId" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="PolicySourceId" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="InvoiceDate" Type="DateTime" Precision="3" />
+          <Property Name="ContributionAmt" Type="Double" />
+          <Property Name="InvoiceStatus" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="InvoiceNo" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="PolicyVersion" Type="Int32" />
+          <Property Name="RPAExceptionLink" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="CGLSExceptionLink" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="InvoiceLink" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ExceptionLink" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="RecordCount" Type="Int32" />
+          <Property Name="InvoiceFile" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="ExceptionFile" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="UploadedFile" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="MappedRPAFile" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="FileUploadFallout_remove" Relationship="EPPCorporatePortalModel.FK_FileUploadFallout_FileUpload" FromRole="FileUpload" ToRole="FileUploadFallout_remove" />
+        </EntityType>
+        <EntityType Name="FileUploadFallout_remove">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FileUploadId" Type="Int32" />
+          <Property Name="Fallout" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="FileUpload" Relationship="EPPCorporatePortalModel.FK_FileUploadFallout_FileUpload" FromRole="FileUploadFallout_remove" ToRole="FileUpload" />
+        </EntityType>
+        <Association Name="FK_FileUploadFallout_FileUpload">
+          <End Type="EPPCorporatePortalModel.FileUpload" Role="FileUpload" Multiplicity="0..1" />
+          <End Type="EPPCorporatePortalModel.FileUploadFallout_remove" Role="FileUploadFallout_remove" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FileUpload">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FileUploadFallout_remove">
+              <PropertyRef Name="FileUploadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SourceId" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FullName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="LastLoginDate" Type="DateTime" Precision="3" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="LoginAttempt" Type="Int32" />
+          <Property Name="LastAttemptDate" Type="DateTime" Precision="3" />
+          <Property Name="IsDelete" Type="Boolean" />
+          <Property Name="LastPasswordChangeDate" Type="DateTime" Precision="3" />
+          <Property Name="EmailAddress" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="MobilePhone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Gender" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ICNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="OTPCode" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="GenOTPCode" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="CorporateUsers" Relationship="EPPCorporatePortalModel.FK_CorporateUsers_User" FromRole="User" ToRole="CorporateUser" />
+          <NavigationProperty Name="UserRoles" Relationship="EPPCorporatePortalModel.FK_UserRole_User" FromRole="User" ToRole="UserRole" />
+        </EntityType>
+        <Association Name="FK_CorporateUsers_User">
+          <End Type="EPPCorporatePortalModel.User" Role="User" Multiplicity="1" />
+          <End Type="EPPCorporatePortalModel.CorporateUser" Role="CorporateUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="CorporateUser">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRole_User">
+          <End Type="EPPCorporatePortalModel.User" Role="User" Multiplicity="1" />
+          <End Type="EPPCorporatePortalModel.UserRole" Role="UserRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserRole">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Corporate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SourceId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Name" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="ParentId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine1" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine2" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine3" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="AddressLine4" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ZipCode" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="State" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EPPCorporatePortalModelStoreContainer" CdmEntityContainer="EPPCorporatePortalEntities">
+          <EntitySetMapping Name="CorporatePolicies">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.CorporatePolicy">
+              <MappingFragment StoreEntitySet="CorporatePolicy">
+                <ScalarProperty Name="CorpId" ColumnName="CorpId" />
+                <ScalarProperty Name="InsurableInterest" ColumnName="InsurableInterest" />
+                <ScalarProperty Name="AccountNo" ColumnName="AccountNo" />
+                <ScalarProperty Name="InsuredNo" ColumnName="InsuredNo" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="PersonInCharge" ColumnName="PersonInCharge" />
+                <ScalarProperty Name="PolicySourceId" ColumnName="PolicySourceId" />
+                <ScalarProperty Name="CorporateSourceId" ColumnName="CorporateSourceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CorporatePolicyDetails">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.CorporatePolicyDetail">
+              <MappingFragment StoreEntitySet="CorporatePolicyDetails">
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="ZipCode" ColumnName="ZipCode" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="AddressLine4" ColumnName="AddressLine4" />
+                <ScalarProperty Name="AddressLine3" ColumnName="AddressLine3" />
+                <ScalarProperty Name="AddressLine2" ColumnName="AddressLine2" />
+                <ScalarProperty Name="AddressLine1" ColumnName="AddressLine1" />
+                <ScalarProperty Name="BankAccountNo" ColumnName="BankAccountNo" />
+                <ScalarProperty Name="BankBranchName" ColumnName="BankBranchName" />
+                <ScalarProperty Name="MarketingStaff" ColumnName="MarketingStaff" />
+                <ScalarProperty Name="EffectiveTo" ColumnName="EffectiveTo" />
+                <ScalarProperty Name="EffectiveFrom" ColumnName="EffectiveFrom" />
+                <ScalarProperty Name="CorporatePolicyId" ColumnName="CorporatePolicyId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CorporateUsers">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.CorporateUser">
+              <MappingFragment StoreEntitySet="CorporateUsers">
+                <ScalarProperty Name="IsOwner" ColumnName="IsOwner" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="CorporateSourceId" ColumnName="CorporateSourceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Menus">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.Menu">
+              <MappingFragment StoreEntitySet="Menu">
+                <ScalarProperty Name="ImagePlaceHolder" ColumnName="ImagePlaceHolder" />
+                <ScalarProperty Name="ParentMenu" ColumnName="ParentMenu" />
+                <ScalarProperty Name="ActionMenuPath" ColumnName="ActionMenuPath" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MenuRights">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.MenuRight">
+              <MappingFragment StoreEntitySet="MenuRights">
+                <ScalarProperty Name="RightsId" ColumnName="RightsId" />
+                <ScalarProperty Name="MenuId" ColumnName="MenuId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Policies">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.Policy">
+              <MappingFragment StoreEntitySet="Policy">
+                <ScalarProperty Name="Entity" ColumnName="Entity" />
+                <ScalarProperty Name="ProductCode" ColumnName="ProductCode" />
+                <ScalarProperty Name="Version" ColumnName="Version" />
+                <ScalarProperty Name="AgentCode" ColumnName="AgentCode" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Renewal" ColumnName="Renewal" />
+                <ScalarProperty Name="PeriodOfCoverEnd" ColumnName="PeriodOfCoverEnd" />
+                <ScalarProperty Name="PeriodOfCoverStart" ColumnName="PeriodOfCoverStart" />
+                <ScalarProperty Name="ContractHolder" ColumnName="ContractHolder" />
+                <ScalarProperty Name="ContractNo" ColumnName="ContractNo" />
+                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
+                <ScalarProperty Name="SourceId" ColumnName="SourceId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Rights">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.Right">
+              <MappingFragment StoreEntitySet="Rights">
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.Role">
+              <MappingFragment StoreEntitySet="Role">
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="HomePageUrl" ColumnName="HomePageUrl" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleRights">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.RoleRight">
+              <MappingFragment StoreEntitySet="RoleRight">
+                <ScalarProperty Name="RightId" ColumnName="RightId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserRoles">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.UserRole">
+              <MappingFragment StoreEntitySet="UserRole">
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="SourceId" ColumnName="SourceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserTypes">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.UserType">
+              <MappingFragment StoreEntitySet="UserType">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AuditTrails">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.AuditTrail">
+              <MappingFragment StoreEntitySet="AuditTrail">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Menu" ColumnName="Menu" />
+                <ScalarProperty Name="UserIPAddress" ColumnName="UserIPAddress" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Users" ColumnName="Users" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SystemConfigs">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.SystemConfig">
+              <MappingFragment StoreEntitySet="SystemConfig">
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Maintainable" ColumnName="Maintainable" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="Setting" ColumnName="Setting" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FileUploads">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.FileUpload">
+              <MappingFragment StoreEntitySet="FileUpload">
+                <ScalarProperty Name="MappedRPAFile" ColumnName="MappedRPAFile" />
+                <ScalarProperty Name="UploadedFile" ColumnName="UploadedFile" />
+                <ScalarProperty Name="ExceptionFile" ColumnName="ExceptionFile" />
+                <ScalarProperty Name="InvoiceFile" ColumnName="InvoiceFile" />
+                <ScalarProperty Name="RecordCount" ColumnName="RecordCount" />
+                <ScalarProperty Name="ExceptionLink" ColumnName="ExceptionLink" />
+                <ScalarProperty Name="InvoiceLink" ColumnName="InvoiceLink" />
+                <ScalarProperty Name="CGLSExceptionLink" ColumnName="CGLSExceptionLink" />
+                <ScalarProperty Name="RPAExceptionLink" ColumnName="RPAExceptionLink" />
+                <ScalarProperty Name="PolicyVersion" ColumnName="PolicyVersion" />
+                <ScalarProperty Name="InvoiceNo" ColumnName="InvoiceNo" />
+                <ScalarProperty Name="InvoiceStatus" ColumnName="InvoiceStatus" />
+                <ScalarProperty Name="ContributionAmt" ColumnName="ContributionAmt" />
+                <ScalarProperty Name="InvoiceDate" ColumnName="InvoiceDate" />
+                <ScalarProperty Name="PolicySourceId" ColumnName="PolicySourceId" />
+                <ScalarProperty Name="CorporateSourceId" ColumnName="CorporateSourceId" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="DestinationPath" ColumnName="DestinationPath" />
+                <ScalarProperty Name="LocalPath" ColumnName="LocalPath" />
+                <ScalarProperty Name="MappedFileName" ColumnName="MappedFileName" />
+                <ScalarProperty Name="UploadedBy" ColumnName="UploadedBy" />
+                <ScalarProperty Name="UploadedDateTime" ColumnName="UploadedDateTime" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="CorporateId" ColumnName="CorporateId" />
+                <ScalarProperty Name="UploadType" ColumnName="UploadType" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FileUploadFallout_remove">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.FileUploadFallout_remove">
+              <MappingFragment StoreEntitySet="FileUploadFallout_remove">
+                <ScalarProperty Name="Fallout" ColumnName="Fallout" />
+                <ScalarProperty Name="FileUploadId" ColumnName="FileUploadId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="GenOTPCode" ColumnName="GenOTPCode" />
+                <ScalarProperty Name="OTPCode" ColumnName="OTPCode" />
+                <ScalarProperty Name="ICNo" ColumnName="ICNo" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="MobilePhone" ColumnName="MobilePhone" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="LastPasswordChangeDate" ColumnName="LastPasswordChangeDate" />
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+                <ScalarProperty Name="LastAttemptDate" ColumnName="LastAttemptDate" />
+                <ScalarProperty Name="LoginAttempt" ColumnName="LoginAttempt" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="LastLoginDate" ColumnName="LastLoginDate" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="SourceId" ColumnName="SourceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Corporates">
+            <EntityTypeMapping TypeName="EPPCorporatePortalModel.Corporate">
+              <MappingFragment StoreEntitySet="Corporate">
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="ZipCode" ColumnName="ZipCode" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="AddressLine4" ColumnName="AddressLine4" />
+                <ScalarProperty Name="AddressLine3" ColumnName="AddressLine3" />
+                <ScalarProperty Name="AddressLine2" ColumnName="AddressLine2" />
+                <ScalarProperty Name="AddressLine1" ColumnName="AddressLine1" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="SourceId" ColumnName="SourceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

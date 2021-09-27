@@ -1,0 +1,184 @@
+@font-face {
+    font-family: "MetaPro";
+    src: url('./assets/font/MetaPro-Normal.otf');
+}
+
+@font-face {
+    font-family: "MetaProBold";
+    src: url('./assets/font/MetaPro-Bold.otf');
+}
+
+@font-face {
+    font-family: "MetaPro-Medium";
+    src: url('./assets/font/MetaPro-Medium.otf');
+}
+
+body {
+    font-family: "MetaPro";
+}
+.falloutError{
+    color:red;
+}
+.bold {
+    font-family: "MetaProBold";
+}
+
+.wrapper {
+    height:100vh;
+    /* overflow:hidden; */
+    width:100%;
+}
+
+a , a:hover{
+    color: #212529;
+    background-color: transparent;
+}
+
+.wrapper > div:first-child {
+    width:55%;
+    background-image: url("./assets/img/login_bg.jpg"); 
+    background-color: #cccccc; 
+    height: 100vh; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index:2;
+}
+
+.wrapper > div:nth-child(2){
+    width:45%;
+}
+
+.logo {
+    position: absolute;
+    top: 35px;
+    left: 35px;
+    width: 135px;
+}
+
+.higlight {
+    color:#FFBF00;
+}
+
+.page-title {
+    font-family: "MetaProBold";
+    font-size: 1.8rem;
+}
+
+.login-section {
+    padding: 3% 5% 0px 5%;
+}
+
+.caption {
+    font-family: "MetaPro";
+    color:#767676;
+    margin-top: 1rem;
+    font-size: 14px;
+}
+
+.forgot-username , .forgot-username > a {
+    font-family: "MetaPro";
+    color: #49C0B6;
+    font-size: 14px;
+}
+
+.margin {
+    margin-top:50px;
+    margin-bottom: 15px;
+}
+
+.form-control  {
+    padding: 25px 10px;
+    font-size: 14px;
+}
+
+.btn-login {
+    width: 100%; 
+    height: 50px;
+    margin-top: 25px;
+}
+
+.foot-note {
+    color:#707070;
+    font-size: 13px;
+}
+
+.logo-mobile {
+    display:none;
+}
+
+.error-login {
+    color: red;
+    font-size: 13px;
+}
+
+.form-gap {
+    margin-top: 10px;
+}
+
+.yellow-overlay-mobile {
+    display:none;
+}
+
+@media only screen and (max-width: 767px) {
+
+    .yellow-overlay-mobile {
+        display:block;
+    }
+    
+
+    .wrapper {
+        margin-right: 0;
+        margin-left: 0;
+        height:100%;
+    }
+
+    .wrapper > div:first-child {
+        display:none;
+    }
+
+    .wrapper > div:nth-child(2){
+        width:100%;
+    }
+
+    body {
+        background-image: url("./assets/img/bg.png"); 
+        background-color: #ffc107;
+        background-position: center; 
+        background-repeat: no-repeat; 
+        background-size: cover;
+        height: 100vh;
+    }
+
+    .login-section-inner-wrapper {
+        background-color:#fff;
+        padding: 10%;
+        border-radius: 5px;
+        position: absolute;
+        top: 40px;
+        width: 90%;
+    }
+
+    .logo-mobile {
+        display:block;
+        margin-bottom: 35px;
+        margin-top: 15px;
+    }
+
+}
+
+@media only screen and (max-width: 700px) {
+    .page-title {
+        font-family: "MetaProBold";
+        font-size: 1.4rem;
+    }
+
+    .logo-mobile {
+        width: 90px;
+    }      
+
+    .margin {
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+}

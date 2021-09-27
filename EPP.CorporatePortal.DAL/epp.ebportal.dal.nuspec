@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$authors$</authors>
+    <owners>$owners$</owners>
+    <projectUrl>$projecturl$</projectUrl>
+    <iconUrl>$iconurl$</iconUrl>
+    <licenseUrl>$licenseurl$</licenseUrl>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <description>$description$</description>
+    <summary>$summary$</summary>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>$owners$</copyright>
+    <language>$language$</language>
+    <tags>$tags$</tags>
+  </metadata>
+</package>

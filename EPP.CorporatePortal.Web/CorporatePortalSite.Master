@@ -1,0 +1,215 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="CorporatePortalSite.Master.cs" Inherits="EPP.CorporatePortal.CorporatePortalSite" %>
+<%@ Import namespace="EPP.CorporatePortal.Models" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Untitled Page</title>
+    <link href="<%= ResolveUrl("~/Style/assets/vendor/bootstrap.min.css") %>" rel="stylesheet" type="text/css" />
+    <link href="<%= ResolveUrl("~/Style/dashboard.css") %>" rel="Stylesheet" type="text/css" />
+    <link href="<%= ResolveUrl("~/Style/fontawesome/css/font-awesome.min.css") %>" rel="stylesheet" type="text/css" />
+    <link href="<%= ResolveUrl("~/Style/Datatable/datatables.min.css") %>" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+    <%-- <link rel="stylesheet" type="text/css" href="~/Style/dashboard-expand.css"/> --%>
+</head>
+<body>
+     <div class="mobile-overlay"></div>
+     <form id="form1" runat="server">
+         
+         <asp:HiddenField ID="hdnPermission" ClientIDMode="Static" value="" runat="server"/>
+         <asp:HiddenField ID="hdnHomePage" ClientIDMode="Static" value="" runat="server"/>
+        
+         <div class="main">
+              <div class="sidenav">
+                <ul class="menu">
+                
+                	<li>
+                        <div class="close-btn" onclick="open_menu()"></div>
+                        <div class="clear-float"></div>
+                    </li>
+                    <li> 
+                    	<a href="#">
+                    		<img alt="Etiqa" class="logo-smile logo-desktop" src="<%= ResolveUrl("~/Style/assets/img/logo-white.svg") %>" />
+                    	</a>
+                    </li>
+                    <li>
+                    	<p class="eb">EB</p>
+                    </li>
+                    
+                     <li class="welcome">
+                        <div class=""><%=Resources.Resource.Welcome %>, </div>
+                        <div class="bold username" id="txtName" runat="server"></div>
+
+<%--                        <p class="welcome-user "><%=Resources.Resource.Role %>: <span id="txtRoles" runat="server"></span></p>--%>
+                    </li>
+                     
+                     
+                     
+                     <asp:Repeater ID="rptMenu" runat="server" >
+                         <ItemTemplate>                                     
+                                <li class="menu-page">      
+                                    <a href="<%# ResolveUrl(GetActionPath(Container.DataItem)) %>" style="text-align:center" title="<%# GetTitleAndName(Container.DataItem) %>">
+                                    <img alt="<%# GetTitleAndName(Container.DataItem) %>" src="<%# ResolveUrl(Eval("ImagePlaceHolder").ToString()) %>"/><br /> <%# GetTitleAndName(Container.DataItem) %> 
+                                    </a>
+                                </li>
+                          </ItemTemplate>
+                      </asp:Repeater>
+                
+                   
+                </ul>                
+                <button class="btn btn-logout-mobile" onclick="location.href='<%# ResolveUrl("~/Shared/Logout.aspx") %>';" type="button">Logout &gt;</button><br />
+                <div class="lastlogin-mobile">Last Login:&nbsp;<asp:Label runat="server" ID="lblLoggedInDateTime2"></asp:Label></div>
+              </div>
+              <div class="content">
+                
+                <nav class="nav nav-custom fixed-top">
+
+                    <!----------------------- Mobile ------------------------------->
+                       <div class="col-md-12 nav-mobile">
+
+                          <div class="nav-mobile-inner-wrapper">
+                            <i class="fa fa-bars" onclick="open_menu()"></i>
+                              <div class="logo-wrapper">
+                                  <img class="logo-smile" alt="logo" src="<%= ResolveUrl("~/Style/assets/img/logo-white.svg") %>" />
+                               <div>EB Portal</div>
+                           </div>
+
+                           <div class="bell-wrapper">
+                              <img src="<%= ResolveUrl("~/Style/assets/icon/bell-white.svg") %>" alt="bell" />
+                           </div>
+
+                         </div>
+
+                   </div>
+                  
+                  <!------------------------------------------------------------->
+
+                    <div class="col-md-8">
+                        <%--<p class="account"><%=Resources.Resource.Account %></p>--%>
+						<p class="account">Company Name</p>
+                        <input id="txtTimer" style="display:none"  />
+                          <div class="acount-wrapper">
+                            <h3 class="parent-company">
+                                 <asp:Label runat="server" ID="lblAccName"></asp:Label>                               
+                            </h3>                           
+                            <div class="subsidiary" id="open-sub">
+                                <b><asp:Label runat="server" ID="lblSubCount"></asp:Label></b><%=Resources.Resource.Subsidiary %>
+                                <i class="fa fa-chevron-down fa-sub" ></i>
+                            </div>
+                
+                        </div>
+                        <div class="subsidiary-info hide" style="width:100%">
+                            <p><%=Resources.Resource.ChooseAccountToManage %></p>
+<%--                            <div class="input-group mb-3">
+                                <input type="text" class="form-control  search-box" placeholder="Search by Name" runat="server" id="txtSearch"/>
+                                <div class="input-group-append">
+                                    
+                                     <button class="btn search-icon" type="button" runat="server" onserverclick="btnSearchCorp_Click"></button>
+                                </div>
+                            </div>--%>
+                            <br/>
+                            <p class="rm-margin "><%=Resources.Resource.MasterAccount %></p>
+                            
+                            <input id="checkbox-master" class="checkbox-custom" name="checkbox-master" type="checkbox" checked="checked" onclick="javascript: GoTo('parent')"/>
+                            <label for="checkbox-master" class="checkbox-custom-label"><asp:Label runat="server" ID="lblAccName2"></asp:Label></label>
+                            <asp:HiddenField ID="hdnParentCorpId" ClientIDMode="Static" runat="server" />
+                            <asp:HiddenField ID="hdnUCorpId" ClientIDMode="Static" runat="server" />
+                            <br/> <br/>
+                             <%--<p class="rm-margin "><asp:Label runat="server" ID="lblSubCount2"></asp:Label> Subsidiary</p>--%>
+
+                           <table id="tableSub" class="display" style="width:100%">  
+                               <thead>
+                                   <tr>
+                                       <th><a class="rm-margin "><asp:Label runat="server" ID="lblSubCount2"></asp:Label> Subsidiary</a>
+                                           <input type="hidden" id="hdnSelectedCorporate" value="<%= Utility.EncodeAndDecryptCorpId(Request.QueryString["CorpID"])%>" />
+                                       </th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                              <asp:Repeater ID="rptSubsidaries" runat="server">
+                                  <ItemTemplate>  
+                                    <tr>
+                                        <td> <input id="checkbox-<%#Eval("Id") %>" class="checkbox-custom" name="checkbox-<%#Eval("Id") %>" type="checkbox" onclick="javascript: GoTo('<%# EncryptCorpId(Container.DataItem)%>','<%# EncryptUid(Container.DataItem)%>')"/>
+                                    <label for="checkbox-<%# Eval("Id")%>" class="checkbox-custom-label"><%# Eval("Name") %></label></td>
+                                   </tr>
+
+                                 </ItemTemplate>
+                                </asp:Repeater>
+                               </tbody>
+                           </table>
+
+                             
+
+                        </div>
+                     </div>
+                    <div class="col-md-4">
+                        <ul class="misc">
+                           <%-- <li><span class="languageOption" ><%=Resources.Resource.ChooseLanguage %>: <a href="~/ChangeLanguage.aspx?lang=en-US" title="<%=Resources.Resource.English%>"><%=Resources.Resource.English%></a>  |<a href="~/ChangeLanguage.aspx?lang=ms-MY" title="<%=Resources.Resource.Malay%>"> <%#Resources.Resource.Malay%></a></span></li>--%>  
+                            <%--<li><img alt="Cart" runat="server" src="~/Style/assets/icon/cart.svg"/></li>
+                            <li><img alt="Inbox" runat="server" src="~/Style/assets/icon/inbox.svg"/></li>
+                            <li><img alt="Notification" runat="server" src="~/Style/assets/icon/bell.svg"/></li>--%>
+
+                            <li><a href="<%# ResolveUrl("~/Shared/Logout.aspx") %>" title="<%=Resources.Resource.Logout %>"><%=Resources.Resource.Logout %> ></a></li>
+
+
+                        </ul><br />
+                        <div class="lastlogin">
+                            Last Login:&nbsp;<asp:Label runat="server" ID="lblLoggedInDateTime"></asp:Label>
+                        </div>
+                    </div>
+                </nav>
+                <asp:ContentPlaceHolder id="MainContent" runat="server">
+                </asp:ContentPlaceHolder>           
+             </div>
+         </div>
+     </form>
+    <script type="text/javascript">
+
+        AutoSelect();
+
+        function AutoSelect() {
+            var selectedCorp = document.getElementById('hdnSelectedCorporate');
+             
+            if (selectedCorp.value > "") {
+                var selectChkBox = document.getElementById('checkbox-' + selectedCorp.value);
+                selectChkBox.checked = true;
+                 var selectChkBox2 = document.getElementById('checkbox-master');
+                selectChkBox2.checked = false;
+            }
+            else//select the master account
+            {
+                var selectChkBox2 = document.getElementById('checkbox-master');
+                selectChkBox2.checked = true;
+            }
+        }
+        function GoTo(corpName, UCorpId) {
+            alert(corpName + " || " + UCorpId);
+            //var corpname = document.getElementById(corpName);
+           //alert(corpname.innerHTML);
+            
+            var homepage = document.getElementById('hdnHomePage');
+            //alert(homepage.value);
+            if (corpName != "" && corpName != "0") {
+                var corpid = corpName;
+                var UCorpId = UCorpId;
+
+                if (corpName == "parent") corpid = $("#hdnParentCorpId").val();
+                window.location.href = homepage.value + "?CorpId=" + corpid + "&UCorpId=" + UCorpId;
+            }
+            else {
+                window.location.href = homepage.value ;
+            }
+        }
+
+        $(document).ready(function () {
+
+                 $('#tableSub').dataTable({
+                     "searching": true
+                 });
+
+            });  
+    </script>
+    <script type="text/javascript" src="<%= ResolveUrl("~/Style/Datatable/datatables.min.js") %>"></script>
+</body>
+    
+</html>

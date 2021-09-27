@@ -1,0 +1,380 @@
+﻿using System;
+using System.Globalization;
+using EPP.CorporatePortal.Helper;
+using System.IO;
+using EPP.CorporatePortal.DAL.Service;
+using System.Configuration;
+using System.Linq;
+using System.Data;
+using System.Web.UI;
+using System.Collections.Generic;
+
+namespace EPP.CorporatePortal.Models
+{
+    public static class Utility
+    {
+        private static string key = "AbATeOY7eIa0CRnazucA5YVG";
+        public static string TitleCase(string value)
+        {
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+
+            return ti.ToTitleCase(value.ToLower());
+            
+        }
+        public static string Encrypt(string str)
+        {
+            if (!IsEncrypted(str))
+            {
+                return EncryptionHelper.Encrypt(str, true, key);
+            }
+            return str;
+        }
+        public static string Decrypt(string str)
+        {
+            if (IsEncrypted(str, out string decryptedKey))
+            {
+                return decryptedKey;
+            }
+            return str;
+        }
+        public static bool IsEncrypted(string corpId)
+        {
+            //Call function, but only returning the bool result.
+            return IsEncrypted(corpId, out string tmpKey);
+        }
+        public static bool IsEncrypted(string corpId, out string decryptedKey)
+        {
+            decryptedKey = "";
+            bool returnValue = false;
+            try
+            {
+                decryptedKey = EncryptionHelper.Decrypt(corpId, true, key);
+                returnValue = true;
+            }
+            catch
+            {
+                returnValue = false;
+            }
+            return returnValue;
+        }
+        public static string EncodeAndDecryptCorpId(string input)
+        {
+            var returnValue = "";
+            if (!string.IsNullOrEmpty(input))
+            {
+                input = input.Replace(" ", "+");
+                input = Decrypt(input);
+                returnValue = input;
+            }
+            return returnValue;
+        }
+        public static string GetHomePageByRole(string userName)
+        {
+            var roles = new RolesService().GetUserRolesObject(userName);
+            return roles.FirstOrDefault().HomePageUrl;
+        }
+
+        public static void CopyRemoteFiles(string localPath, string remotePath, string userName)
+        {
+            var wildcard = "";
+            CopyRemoteFiles(localPath, remotePath, userName, wildcard);
+        }
+
+        public static void CopyRemoteFiles(string localPath, string remotePath, string userName, string wildcard)
+        {
+            try
+            {
+                //Directory.GetFiles(@"C:\Users\Me\Documents", "*.docx");
+
+                //Copy Exception Files and Delete from Remote
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    if (!Directory.Exists(localPath))
+                    {
+                        Directory.CreateDirectory(localPath);
+                    }
+
+                    //Loop through all subfolders in the directory path
+                    var subDirectoryList = Directory.GetDirectories(remotePath);
+                    foreach (var subDirectory in subDirectoryList)
+                    {
+                        //Creates the Subdirectory in local if does not exists
+                        var subDirectoryLocal = subDirectory.Replace(Directory.GetParent(subDirectory).FullName, localPath);
+                        if (!Directory.Exists(subDirectoryLocal))
+                        {
+                            Directory.CreateDirectory(subDirectoryLocal);
+                        }
+
+                        //Lopp thorugh files in Subdirectory
+                        var fileList = !string.IsNullOrEmpty(wildcard) ? Directory.GetFiles(subDirectory, wildcard) : Directory.GetFiles(subDirectory);
+                        foreach (var srcPath in fileList)
+                        {
+                            //Do nothing if file has been copied over.
+                            if (!File.Exists(localPath + Path.GetFileName(srcPath)))
+                            {
+                                File.Copy(srcPath, srcPath.Replace(subDirectory, subDirectoryLocal), true);
+                                //File.Delete(srcPath);
+                                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, Path.GetFileName(srcPath) + " has been copied to " + subDirectoryLocal, "FileProcessing");
+                            }
+                        }
+
+                        ////Delete Subdirectory once all files done and is empty
+                        //if (!Directory.EnumerateFileSystemEntries(subDirectory).Any())
+                        //{
+                        //    Directory.Delete(subDirectory, true);
+                        //}
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in CopyRemoteFiles: " + ex.Message, "FileProcessing");
+            }
+        }
+
+        public static void CopyRemoteFile(string localPath, string remotePath, string userName)
+        {
+            try
+            {
+                //Directory.GetFiles(@"C:\Users\Me\Documents", "*.docx");
+
+                //Copy Exception Files and Delete from Remote
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    if (!Directory.Exists(localPath))
+                    {
+                        Directory.CreateDirectory(localPath);
+                    }
+
+                    if (File.Exists(remotePath))
+                    {
+                        //Do nothing if file has been copied over.
+                        if (!File.Exists(localPath + Path.GetFileName(remotePath)))
+                        {
+                            File.Copy(remotePath, remotePath.Replace(Path.GetDirectoryName(remotePath), localPath), true);
+                            File.Delete(remotePath);
+                            var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, Path.GetFileName(remotePath) + " has been copied to " + localPath, "FileProcessing");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in CopyRemoteFile: " + ex.Message, "FileProcessing");
+            }
+        }
+
+        public static void DeleteRemoteFile(string remotePath, string userName)
+        {
+            try
+            {
+                //Directory.GetFiles(@"C:\Users\Me\Documents", "*.docx");
+
+                //Copy Exception Files and Delete from Remote
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    if (File.Exists(remotePath))
+                    {
+                        File.Delete(remotePath);
+                        var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, Path.GetFileName(remotePath) + " has been deleted", "FileProcessing");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in CopyRemoteFile: " + ex.Message, "FileProcessing");
+            }
+        }
+
+        public static void DeleteRemoteFolder(string remotePath, string userName)
+        {
+            try
+            {
+                //Directory.GetFiles(@"C:\Users\Me\Documents", "*.docx");
+
+                //Copy Exception Files and Delete from Remote
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    if (Directory.Exists(remotePath))
+                    {
+                        Directory.Delete(remotePath, true);
+                        var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "Directory deleted: " + Path.GetFileName(remotePath), "FileProcessing");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in CopyRemoteFile: " + ex.Message, "FileProcessing");
+            }
+        }
+
+        public static byte[] CopyRemoteFileBytes(string remotePath, string userName)
+        {
+            try
+            {
+                //Copy Bytes of file
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    if (File.Exists(remotePath))
+                    {
+                        var fileBytes = File.ReadAllBytes(remotePath);
+                        var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "Get binary data for: " + Path.GetFileName(remotePath), "FileProcessing");
+
+                        return fileBytes;
+                    }
+                    else
+                    {
+                        var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "File not exists for: " + Path.GetFileName(remotePath), "FileProcessing");
+                        return null;
+                    }
+                }                
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in CopyRemoteFileBytes: " + ex.Message, "FileProcessing");
+
+                return null;
+            }            
+        }
+
+        public static void SendRemoteFile(string localPath, string remotePath, string userName, out bool result)
+        {
+            result = true;
+            try
+            {
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    File.Copy(localPath, remotePath, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in SendRemoteFile: " + ex.Message, "FileProcessing");
+                result = false;
+            }
+        }
+
+        public static void SendRemoteFileBytes(byte[] fileBytes, string remotePath, string userName, out bool result)
+        {
+            result = true;
+            try
+            {
+                using (NetworkShareAccesser.Access(Path.GetDirectoryName(remotePath), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                {
+                    using (var fileStream = File.Create(remotePath))
+                    {
+                        Stream stream = new MemoryStream(fileBytes);
+                        stream.Seek(0, SeekOrigin.Begin);
+                        stream.CopyTo(fileStream);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, "Error in SendRemoteFile: " + ex.Message, "FileProcessing");
+                result = false;
+            }
+        }
+
+        public static string FormatCSVDataTypes(string data, string dataType)
+        {
+            string response = "";
+
+            switch(dataType.ToUpper())
+            {
+                case "STRING":
+                    response = "=" + "\"" + data + "\"";
+                    break;
+                case "DECIMAL":
+                    if (Decimal.TryParse(data, out decimal value))
+                        response = value.ToString("0.##");
+                    else
+                        response = data;                  
+                    break;
+                default:
+                    response = data;
+                    break;
+            }
+            return response;
+        }
+
+        public static string GetRelativePathtoFile(string filePath)
+        {
+            var returnPath = "";
+
+            var sitePath = System.Web.HttpContext.Current.Server.MapPath("~");
+            returnPath = filePath.Replace(sitePath, "~/").Replace("\\", "/");
+
+            return returnPath;
+        }
+
+        public static string ExceptionLinksHandling(string combinedLink, string cglsLink, string rpaLink)
+        {
+            var response = "";
+
+            //link priority Combined > CGLS > RPA. To cater for cases where only 1 exception received.
+            var exceptionLink = !string.IsNullOrEmpty(combinedLink) ? combinedLink : !string.IsNullOrEmpty(cglsLink) ? cglsLink : rpaLink;
+
+            //response = !string.IsNullOrEmpty(exceptionLink) ? "<li>Download in Excel format <a href='" + exceptionLink + "'><i class='fa fa-chevron-right btn-download'></i></a></li>" : "<li style='opacity: 0.5;pointer-events: none;'>Download in Excel format <i class='fa fa-chevron-right btn-download'></i></li>";
+
+            response = exceptionLink;
+
+            return response;
+        }
+
+        public static void RegisterStartupScriptHandling(Page currPage, string key, string script, bool addScriptTags, bool logMessage, string userName)
+        {
+            int temp;
+
+            ScriptManager.RegisterStartupScript(currPage, currPage.GetType(), key, script, addScriptTags);
+
+            if (logMessage)
+                temp = new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "RegisterStartupScriptHandling: " + script, currPage.Title);
+        }
+
+        public static bool CheckFileExistsUseWildcard(string path, string fileName, bool isRemotePath)
+        {
+            List<string> filePath = new List<string>();
+            bool result = CheckFileExistsUseWildcard(path, fileName, ref filePath, isRemotePath);
+
+            return result;
+        }
+
+        public static bool CheckFileExistsUseWildcard(string path, string fileName, ref List<string> filePath, bool isRemotePath)
+        {
+            bool result = false;
+
+            try
+            {
+                if (isRemotePath)
+                {
+                    using (NetworkShareAccesser.Access(Path.GetDirectoryName(path), CommonService.GetSystemConfigValue("RemoteAccessUsername"), CommonService.GetSystemConfigValue("RemoteAccessPassword")))
+                    {
+                        var files = System.IO.Directory.GetFiles(path, fileName, System.IO.SearchOption.TopDirectoryOnly).ToList();
+                        if (files.Count > 0)
+                        {
+                            filePath = files;
+
+                            result = true;
+                        }
+                    }
+                }
+                else
+                {
+                    var files = System.IO.Directory.GetFiles(path, fileName, System.IO.SearchOption.TopDirectoryOnly).ToList();
+                    if (files.Count > 0)
+                    {
+                        filePath = files;
+
+                        result = true;
+                    }
+                }
+            }
+            catch (DirectoryNotFoundException ex) //To do nothing if directory doesn't exists. File is assumed not exists and returned false.
+            {
+            }
+
+            return result;
+        }
+    }
+}
