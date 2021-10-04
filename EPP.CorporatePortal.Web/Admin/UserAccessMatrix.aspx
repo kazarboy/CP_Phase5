@@ -11,8 +11,11 @@
             <h1 class="page-title bold">User Access Matrix</h1>
 
             <div class="btn-wrapper">
-                <%--<div class="btn btn-secondary"  style="cursor:pointer">Download QC Listing</div>--%>
-                <div class="btn btn-primary" data-toggle="modal" data-target="#generate-report" style="cursor:pointer">Generate Report</div>
+               <!-- 20210726 - added UAM Report Generation-->
+                <button type="button" class="btn btn-primary" onserverclick="GenerateUAMReport" style="cursor:pointer;margin-left:10px;" runat="server">Download UAM Report</button>
+            </div>
+            <div class="btn-wrapper">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#generate-report" style="cursor:pointer">Download Report Listing</button>
             </div>
         </div>
 

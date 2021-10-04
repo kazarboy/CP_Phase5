@@ -191,10 +191,17 @@
             //alert(homepage.value);
             if (corpName != "" && corpName != "0") {
                 var corpid = corpName;
-                var UCorpId = UCorpId;
+                var UId = UCorpId;
 
-                if (corpName == "parent") corpid = $("#hdnParentCorpId").val();
-                window.location.href = homepage.value + "?CorpId=" + corpid + "&UCorpId=" + UCorpId;
+                if (corpName == "parent")
+                {
+                    corpid = $("#hdnParentCorpId").val();
+                    UId = $("#hdnUCorpId").val();
+
+                    alert("After : " + corpid + " || " + UId);
+                }
+      
+                window.location.href = homepage.value + "?CorpId=" + corpid + "&UCorpId=" + UId;
             }
             else {
                 window.location.href = homepage.value ;

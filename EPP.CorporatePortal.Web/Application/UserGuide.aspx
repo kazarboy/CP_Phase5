@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" Title="Corporate Portal" MasterPageFile="~/CorporatePortalSite.Master" AutoEventWireup="true" CodeBehind="UserGuide.aspx.cs" Inherits="EPP.CorporatePortal.Application.UserGuide" %>
+﻿<%@ Page Language="C#" Title="User Guide" MasterPageFile="~/CorporatePortalSite.Master" AutoEventWireup="true" CodeBehind="UserGuide.aspx.cs" Inherits="EPP.CorporatePortal.Application.UserGuide" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>

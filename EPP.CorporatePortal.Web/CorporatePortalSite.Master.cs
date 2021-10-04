@@ -166,21 +166,27 @@ namespace EPP.CorporatePortal
             var userName = _UserIdentityModel.PrincipalName;
             //var bizRegNo = identity.Claims.Where(c => c.Type == "BusinessRegistrationNo").Select(c => c.Value).SingleOrDefault();
             var bizRegNo = _UserIdentityModel.BusinessRegistrationNo;
+            var ParentUCorpId = _UserIdentityModel.UCorpId;
             txtName.InnerHtml = Server.HtmlEncode(fullName);
 
             var newCorpId = Utility.EncodeAndDecryptCorpId( Request.QueryString["CorpId"])  ?? "0";
             var newUCorpId = Utility.EncodeAndDecryptCorpId(Request.QueryString["UCorpId"]) ?? "0";
 
             var storedProcServ = new StoredProcService(userName);
-            var uid = storedProcServ.GetCorporateUId(parentBizRegNo, parentCorporate);
-            var UCorpId = uid.Rows[0]["Id"].ToString();
 
-            _UserIdentityModel.UCorpId = UCorpId;
+            if (newUCorpId == "undefined" || string.IsNullOrEmpty(newUCorpId))
+            {
+                var uid = storedProcServ.GetCorporateUId(parentBizRegNo, parentCorporate);
+                string UCorpId = uid.Rows[0]["Id"].ToString();
 
+                _UserIdentityModel.UCorpId = UCorpId;
+                newUCorpId = UCorpId;
+            }
 
             if (newCorpId != "0" && newUCorpId != "0")
             {         
                 var corporate = storedProcServ.GetCorporateById(newCorpId, newUCorpId);
+
                 if (corporate.Rows.Count > 0)
                 {
                     var serv = new LoginService();
@@ -196,7 +202,7 @@ namespace EPP.CorporatePortal
             }
 
             hdnParentCorpId.Value = Utility.Encrypt(parentBizRegNo);
-            hdnUCorpId.Value = Utility.Encrypt(UCorpId);
+            hdnUCorpId.Value = Utility.Encrypt(ParentUCorpId);
 
             //To display user's lastlogin datetime.
             if (Session[appCode + "LastLoginDate"] != null)

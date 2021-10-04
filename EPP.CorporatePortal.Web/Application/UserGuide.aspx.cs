@@ -28,7 +28,7 @@ namespace EPP.CorporatePortal.Application
             {
                 hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
 
-                var accessPermission = Rights_Enum.ManageClaim;
+                var accessPermission = Rights_Enum.ManageAdminTasks;
                 //var accessPermission = accessEnum(userName);
                 HiddenField hdnPermission = (HiddenField)Page.Master.FindControl("hdnPermission");
                 hdnPermission.Value = Enum.GetName(typeof(Rights_Enum), accessPermission);

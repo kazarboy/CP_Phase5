@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Claim Listing" Language="C#" MasterPageFile="~/CorporatePortalSite.Master" AutoEventWireup="true" CodeBehind="AuditLog.aspx.cs" Inherits="EPP.CorporatePortal.Admin.AuditLog" %>
+﻿<%@ Page Title="Audit Log" Language="C#" MasterPageFile="~/CorporatePortalSite.Master" AutoEventWireup="true" CodeBehind="AuditLog.aspx.cs" Inherits="EPP.CorporatePortal.Admin.AuditLog" %>
 <%@ Import namespace="EPP.CorporatePortal.Models" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <link rel="stylesheet" type="text/css" href="<%= ResolveUrl("~/Style/claim.css") %>" />

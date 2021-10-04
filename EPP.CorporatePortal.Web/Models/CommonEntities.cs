@@ -41,7 +41,7 @@ namespace EPP.CorporatePortal.Models
                 dr["SourceId"] = Utility.Encrypt(policyId);
             }
 
-            new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "Retreiving Policies for Corporate:" + decryptedCorpId, "DBEntities");
+            new AuditTrail().LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "Retreiving Policies for Corporate:" + decryptedCorpId + " UID:"+ decryptedUCorpId, "DBEntities");
             return policies;
         }
         public static void DeleteUser(string username, string loginToken, string author, Page currPage)

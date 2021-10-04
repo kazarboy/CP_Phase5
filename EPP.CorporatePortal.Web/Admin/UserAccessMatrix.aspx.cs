@@ -164,6 +164,34 @@ namespace EPP.CorporatePortal.Admin
 
         }
 
+        protected void GenerateUAMReport(object sender, EventArgs e)
+        {
+            var userName = ((CorporatePortalSite)this.Master)._UserIdentityModel.PrincipalName;
+
+            var service = new StoredProcService(userName);
+
+            try
+            {
+                //var dt = new DataTable();
+                DataTable dt = service.GetUserAccessMatrixReport();
+                var fileBinary = ConvertUAMDatatableHTML(dt);
+
+                System.Web.HttpResponse response = System.Web.HttpContext.Current.Response;
+                response.ClearContent();
+                response.Clear();
+                response.ContentType = "application/pdf";
+                response.AddHeader("Content-Disposition", "attachment; filename=UAM_" +DateTime.Now.ToString("yyyyMMddHHmm") + ".pdf");
+                response.BinaryWrite(fileBinary);
+                response.Flush();
+                response.End();
+            }
+            catch (Exception errMsg)
+            {
+                //In case got any uncaptured errors.
+                auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName,errMsg.ToString(), "UserAccessMatrix_UAMReport"); ;
+            }
+        }
+
         private byte[] ConvertDatatableHTML(DataTable dt)
         {
             byte[] retByte;
@@ -243,6 +271,85 @@ namespace EPP.CorporatePortal.Admin
                 throw;
             }
         }
+
+        private byte[] ConvertUAMDatatableHTML(DataTable dt)
+        {
+            byte[] retByte;
+            int i = 1;
+            List<string> getaccess = new List<string>();
+            List<string> getrole = new List<string>();
+
+            try
+            {
+                string htmlString = string.Empty;
+                htmlString = System.IO.File.ReadAllText(HttpContext.Current.Server.MapPath("UAM_Template.html"));
+
+                StringBuilder builder = new StringBuilder();
+                StringBuilder buildhtml = new StringBuilder(htmlString);
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (dr["Name"].ToString() != "Agent")
+                    {
+                        getrole.Add(dr["Name"].ToString());
+                    }
+                }
+
+                var filter = getrole.Select(z => z).Distinct();
+
+                builder.Append("<tbody>");
+
+                for (int y = 0; y < filter.ToList().Count(); y++)
+                {
+                    var check = filter.ToList()[y].ToString();
+                    var checknum = filter.Count();
+
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        if (filter.ToList()[y].ToString() == dr["Name"].ToString())
+                        {
+                            getaccess.Add(dr["AccessName"].ToString());
+                        }
+                    }
+
+                    string RoleName = filter.ToList()[y].ToString() == "Admin" ? "EB Admin" : filter.ToList()[y].ToString() == "UIDAdmin" ? "System Admin" : filter.ToList()[y].ToString() == "HR" ? "Corporate User" : "";
+
+                    builder.Append("<tr>");
+                    builder.Append("<td>" + i.ToString() + "</td>");
+                    builder.Append("<td>" + RoleName + "</td>");
+                    builder.Append("<td style=font-family:Wingdings;font-size:24px;>ü</td>");
+                    builder.Append("<td style=font-family:Wingdings;font-size:24px;>ü</td>");
+                    builder.Append(getaccess.Contains("CreateUsers") && (RoleName == "EB Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("ManageAccess") && (RoleName == "EB Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("ManageAccess") && (RoleName == "EB Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("CreateUsers") && (RoleName == "System Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("ManageAccess") && (RoleName == "System Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("ManageAccess") && (RoleName == "System Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("ContractPolicy") && (RoleName == "Corporate User") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("Member") && (RoleName == "Corporate User") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("ClaimListing") && (RoleName == "Corporate User") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("UserAccessMatrix") && (RoleName == "EB Admin" || RoleName == "System Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append(getaccess.Contains("AuditLog") && (RoleName == "EB Admin" || RoleName == "System Admin") ? "<td style=font-family:Wingdings;font-size:24px;>ü</td>" : "<td></td>");
+                    builder.Append("<td style=font-family:Wingdings;font-size:24px;>ü</td>");
+                    builder.Append("</tr>");
+
+                    i++;
+                    getaccess.Clear();
+                }
+
+                buildhtml.Replace("<tbody>", builder.ToString());
+
+                retByte = Utility.PdfSharpConvertA4(buildhtml.ToString(), "UAM");
+
+                return retByte;
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+                throw;
+            }
+        }
+
 
         private byte[] ExportDataSetToBytes(DataTable data)
         {

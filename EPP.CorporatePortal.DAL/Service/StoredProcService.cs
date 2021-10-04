@@ -418,6 +418,32 @@ namespace EPP.CorporatePortal.DAL.Service
             }
             return dt;
         }
+
+        public DataTable GetUserAccessMatrixReport()
+        {
+
+            var dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand
+                {
+                    Connection = conn,
+                    CommandType = CommandType.StoredProcedure,
+                    CommandText = "spGetUserAccessMatrixReport"
+                };
+
+                using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                {
+                    sda.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetUserAccessMatrix.Error : " + ex.Message, "StoredProcService");
+            }
+            return dt;
+        }
+
         public DataTable GetClaimsList(string userName)
         {
 
@@ -1925,6 +1951,7 @@ namespace EPP.CorporatePortal.DAL.Service
                     CommandText = "spGetCorporate"
                 };
                 cmd.Parameters.Add("@CorporateId", SqlDbType.VarChar).Value = CorpID;
+                cmd.Parameters.Add("@UCorpId", SqlDbType.VarChar).Value = DBNull.Value;
 
                 using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
                 {

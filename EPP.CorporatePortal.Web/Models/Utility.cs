@@ -937,7 +937,7 @@ namespace EPP.CorporatePortal.Models
 
             using (MemoryStream ms = new MemoryStream())
             {
-                var config = new PdfGenerateConfig()
+                PdfGenerateConfig config = new PdfGenerateConfig()
                 {
                     MarginBottom = 20,
                     MarginLeft = 20,
@@ -946,25 +946,10 @@ namespace EPP.CorporatePortal.Models
                     PageSize = PageSize.A3
                 };
 
-                var pdf = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(html, config);
+                PdfDocument pdf = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(html, config);
                 pdf.Save(ms);
                 res = ms.ToArray();
             }
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(1200, 1800);
-            //    var doc = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(html, PageSize.A4);
-            //    PdfPage page = new PdfPage();
-            //    XImage img = XImage.FromGdiPlusImage(bitmap);
-            //    doc.Pages.Add(page);
-            //    XGraphics xgr = XGraphics.FromPdfPage(doc.Pages[0]);
-            //    xgr.DrawImage(img, 0, 0);
-            //    doc.Save(ms);
-            //    doc.Close();
-
-            //    res = ms.ToArray();
-            //}
-
 
             return res;
         }
@@ -973,7 +958,7 @@ namespace EPP.CorporatePortal.Models
         {
             Byte[] res = null;
 
-            var config = new PdfGenerateConfig()
+            PdfGenerateConfig config = new PdfGenerateConfig()
             {
                 MarginBottom = 20,
                 MarginLeft = 20,
@@ -986,12 +971,50 @@ namespace EPP.CorporatePortal.Models
             
             using (MemoryStream ms = new MemoryStream())
             {
-                var pdf = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(html, config);
+                PdfDocument pdf = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(html, config);
                 pdf.Save(ms);
                 res = ms.ToArray();
              }
 
              return res;
+        }
+
+        public static Byte[] PdfSharpConvertA4(String html, string doctype = null)
+        {
+            Byte[] res = null;
+            var config = (dynamic)null;
+
+            if (doctype == "UAM")
+            {
+                config = new PdfGenerateConfig()
+                {
+                    PageSize = PageSize.A3,
+                    PageOrientation = PageOrientation.Landscape,
+
+                };
+            }
+            else
+            {
+                config = new PdfGenerateConfig()
+                {
+                    MarginBottom = 20,
+                    MarginLeft = 20,
+                    MarginRight = 20,
+                    MarginTop = 20,
+                    PageSize = PageSize.A3,
+                    PageOrientation = PageOrientation.Landscape,
+
+                };
+            }
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                var pdf = TheArtOfDev.HtmlRenderer.PdfSharp.PdfGenerator.GeneratePdf(html, config);
+                pdf.Save(ms);
+                res = ms.ToArray();
+            }
+
+            return res;
         }
 
         public static Byte[] PDFCopyPages(byte[] fileByteFrom, byte[] fileByteTo)
