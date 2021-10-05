@@ -982,7 +982,7 @@ namespace EPP.CorporatePortal.Models
         public static Byte[] PdfSharpConvertA4(String html, string doctype = null)
         {
             Byte[] res = null;
-            var config = (dynamic)null;
+            PdfGenerateConfig config;
 
             if (doctype == "UAM")
             {

@@ -1,4 +1,5 @@
-﻿using EPP.CorporatePortal.DAL.EDMX;
+﻿using EPP.CorporatePortal.Common;
+using EPP.CorporatePortal.DAL.EDMX;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -122,6 +123,16 @@ namespace EPP.CorporatePortal.DAL.Service
             return String.Empty;
         }
 
+        public static Rights_Enum accessEnum(string Getusername)
+        {
+            var dbEntity = new EPPCorporatePortalEntities();
+            var getuserID = dbEntity.Users.Where(x => x.UserName == Getusername).Select(x => x.Id).Single();
+            int getuserroleid = dbEntity.UserRoles.Where(y => y.UserId == getuserID).Select(y => y.RoleId).Single();
 
+            var result = getuserroleid == 1 ? Rights_Enum.ManageAdminTasks
+                : Rights_Enum.ManageClaim;
+
+            return result;
+        }
     }
 }

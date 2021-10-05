@@ -218,7 +218,9 @@ namespace EPP.CorporatePortal.Admin
                 builder.Append("</body>");
                 builder.Append("</html>");
 
-                StreamWriter wr = new StreamWriter(@"D:\Test2.html");
+
+                MemoryStream ms = new System.IO.MemoryStream();
+                StreamWriter wr = new StreamWriter(ms);
                 wr.Write(builder.ToString());
 
                 retByte = Utility.PdfSharpConvertA4(builder.ToString());
