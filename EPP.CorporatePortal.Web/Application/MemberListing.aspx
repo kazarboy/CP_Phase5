@@ -133,7 +133,7 @@
                 <div class="clear-float"></div>
 
                 <div class="table-responsive">
-                    <table class="table table-product" style="min-width:1056px;">
+                    <table class="table table-product" style="min-width:1056px;min-height:250px;">
                         <thead>
                             <tr>
                                 <%--<th scope="col">Policy</th>--%>
@@ -152,7 +152,7 @@
                                 <ItemTemplate>
                                     <tr>
                                <%-- <td scope="col"><%# Eval("PolicyId") %> </td>--%>                                        
-                                <td scope="col"><a href='DownloadFile.ashx?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.UploadFile.ToString() %>' target="_blank"><%# Eval("FileName") %></i></a></td>
+                                <td scope="col"><a href='DownloadFile.ashx?id=<%# Eval("Id").ToString() %>&UCorpId=<%# Eval("UCorpId").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.UploadFile.ToString() %>' target="_blank"><%# Eval("FileName") %></i></a></td>
                                 <%--<td scope="col"><a href="javascript:DownloadOriginalFile('<%# Eval("FileName") %>');"><%# Eval("FileName") %></a></td>--%>
                                 <td scope="col"><%# Eval("UploadedDateTime", "{0:dd/MM/yyyy hh:mm:ss tt}") %> </td>
                                 <td scope="col"><%# Eval("Status") %> </td>
@@ -167,15 +167,15 @@
                                     <li>
                                     <p>Invoice</p>
                                     <ul>
-                                        <li <%# string.IsNullOrEmpty(Eval("InvoiceFile").ToString()) ? "style='opacity: 0.5;pointer-events: none;'" : "" %>>Download in PDF format <a href='DownloadFile.ashx?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.Invoice.ToString() %>' target="_blank"><i class='fa fa-chevron-right btn-download'></i></a></li>
+                                        <li <%# string.IsNullOrEmpty(Eval("InvoiceFile").ToString()) ? "style='opacity: 0.5;pointer-events: none;'" : "" %>>Download in PDF format <a href='DownloadFile.ashx?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.Invoice.ToString() %>&UCorpId=<%# Eval("UCorpId").ToString() %>' target="_blank"><i class='fa fa-chevron-right btn-download'></i></a></li>
                                         <%--<li <%# string.IsNullOrEmpty(Eval("InvoiceLink").ToString()) ? "style='opacity: 0.5;pointer-events: none;'" : "" %>>Download in PDF format <asp:LinkButton ID="LinkButtonDownloadInvoice" runat="server" CommandName='<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.Invoice.ToString() %>' CommandArgument='<%# Eval("Id").ToString() %>' OnCommand="DownloadFile"><i class='fa fa-chevron-right btn-download'></i></asp:LinkButton></li>--%>
                                     <%--<%# !string.IsNullOrEmpty(Eval("InvoiceLink").ToString()) ? "<li>Download in PDF format <a href='" + Eval("InvoiceLink") + "'><i class='fa fa-chevron-right btn-download'></i></a></li>" : "<li style='opacity: 0.5;pointer-events: none;'>Download in PDF format <i class='fa fa-chevron-right btn-download'></i></li>" %>--%>
                                     </ul>
                                     </li>
                                     <li>
                                     <p>Exceptional Report</p>
-                                    <ul>
-                                        <li <%# string.IsNullOrEmpty(Eval("ExceptionFile").ToString()) ? "style='opacity: 0.5;pointer-events: none;'" : "" %>>Download in Excel format <a href='DownloadFile.ashx?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.Exception.ToString() %>' target="_blank"><i class='fa fa-chevron-right btn-download'></i></a></li>
+                                    <ul> 
+                                        <li <%# string.IsNullOrEmpty(Eval("ExceptionFile").ToString()) ? "style='opacity: 0.5;pointer-events: none;'" : "" %>>Download in Excel format <a href='DownloadFile.ashx?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.Exception.ToString() %>&UCorpId=<%# Eval("UCorpId").ToString() %>' target="_blank"><i class='fa fa-chevron-right btn-download'></i></a></li>
                                         <%--<li <%# string.IsNullOrEmpty(EPP.CorporatePortal.Models.Utility.ExceptionLinksHandling(Eval("ExceptionLink").ToString(), Eval("CGLSExceptionLink").ToString(), Eval("RPAExceptionLink").ToString())) ? "style='opacity: 0.5;pointer-events: none;'" : "" %>>Download in Excel format <asp:LinkButton ID="LinkButtonDownloadException" runat="server" CommandName='<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.Exception.ToString() %>' CommandArgument='<%# Eval("Id").ToString() %>' OnCommand="DownloadFile"><i class='fa fa-chevron-right btn-download'></i></asp:LinkButton></li>--%>
                                     <%--<%# ExceptionLinksHandling(Eval("ExceptionLink").ToString(), Eval("CGLSExceptionLink").ToString(), Eval("RPAExceptionLink").ToString()) %>--%>
                                     <%--<%# !string.IsNullOrEmpty(Eval("ExceptionLink").ToString()) ? "<li>Download in Excel format <a href='" + Eval("ExceptionLink") + "'><i class='fa fa-chevron-right btn-download'></i></a></li>" : "<li style='opacity: 0.5;pointer-events: none;'>Download in Excel format <i class='fa fa-chevron-right btn-download'></i></li>" %>--%>

@@ -38,6 +38,7 @@ namespace EPP.CorporatePortal.Application
             }
 
             var newCorpId = Request.QueryString["CorpId"] ?? "0";
+            var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
 
             var returnIndicator = Request.QueryString["Return"] ?? "0";
 
@@ -48,9 +49,12 @@ namespace EPP.CorporatePortal.Application
                 try
                 {
                     HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
+                    HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
                     hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                    hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
 
-                    var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId);
+
+                    var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId);
                     HiddenField hdnExitURL = (HiddenField)Page.Master.FindControl("hdnExitURL");
                     hdnExitURL.Value = exitURL;
 
@@ -62,7 +66,7 @@ namespace EPP.CorporatePortal.Application
                     CommonEntities.ClaimProcessSteps(1, Common.Enums.ClaimStepsStatus.complete.ToString(), false, "", this, userName);
                     CommonEntities.ClaimProcessSteps(2, Common.Enums.ClaimStepsStatus.complete.ToString(), false, "", this, userName);
                     CommonEntities.ClaimProcessSteps(3, Common.Enums.ClaimStepsStatus.complete.ToString(), false, "", this, userName);
-                    CommonEntities.ClaimProcessSteps(4, Common.Enums.ClaimStepsStatus.complete.ToString(), true, ResolveUrl("~/Application/ClaimNewBank.aspx?&CorpId=" + newCorpId + "&Return=1"), this, userName);
+                    CommonEntities.ClaimProcessSteps(4, Common.Enums.ClaimStepsStatus.complete.ToString(), true, ResolveUrl("~/Application/ClaimNewBank.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId + "&Return=1"), this, userName);
                     CommonEntities.ClaimProcessSteps(5, Common.Enums.ClaimStepsStatus.active.ToString(), false, "", this, userName);
                     CommonEntities.ClaimProcessSteps(6, Common.Enums.ClaimStepsStatus.disabled.ToString(), false, "", this, userName);
                     
@@ -487,8 +491,10 @@ namespace EPP.CorporatePortal.Application
 
                 HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
                 var corpID = Utility.Encrypt(hdnCorpId.Value);
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
+                var UCorpId = Utility.Encrypt(hdnUCorpId.Value);
 
-                Response.Redirect(ResolveUrl("~/Application/ClaimNewConfirm.aspx?&CorpId=" + corpID));
+                Response.Redirect(ResolveUrl("~/Application/ClaimNewConfirm.aspx?&CorpId=" + corpID + "&UCorpId=" + UCorpId));
             }
             catch (Exception ex)
             {

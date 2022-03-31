@@ -34,7 +34,8 @@ namespace EPP.CorporatePortal.Application
             System.Web.HttpRequest request = System.Web.HttpContext.Current.Request;
             var id = request.QueryString["id"];
             var type = request.QueryString["type"];
-            
+            var UCorpId = request.QueryString["UCorpId"] ?? "0";
+
             var downloadFileString = "";
             //var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
             //var userName = identity.Claims.Where(c => c.Type == ClaimTypes.Upn).Select(c => c.Value).FirstOrDefault();
@@ -107,7 +108,7 @@ namespace EPP.CorporatePortal.Application
                 {
                     var dt = storedProcService.GetClaimByMemberClaimsID(Convert.ToInt32(id));
                     //If record exists and is the same corpid as requested. Check file's PolicySourceId with user's policy access list.
-                    var policies = CommonEntities.LoadPolicies(bizRegNo, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner);
+                    var policies = CommonEntities.LoadPolicies(bizRegNo, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner,UCorpId);
                     var policyList = policies.AsEnumerable().Select(s => Utility.Decrypt(s["SourceId"].ToString())).Distinct().ToList();
 
                     if (dt.Rows.Count > 0 && policyList.Contains(dt.Rows[0]["PolicyId"].ToString()))
@@ -155,7 +156,7 @@ namespace EPP.CorporatePortal.Application
                 {
                     var dt = storedProcService.GetClaimsMemberDocumentByDocID(Convert.ToInt32(id));
                     //If record exists and is the same corpid as requested. Check file's PolicySourceId with user's policy access list.
-                    var policies = CommonEntities.LoadPolicies(bizRegNo, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner);
+                    var policies = CommonEntities.LoadPolicies(bizRegNo, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner,UCorpId);
                     var policyList = policies.AsEnumerable().Select(s => Utility.Decrypt(s["SourceId"].ToString())).Distinct().ToList();
 
                     if (dt.Rows.Count > 0 && policyList.Contains(dt.Rows[0]["PolicyId"].ToString()))
@@ -203,7 +204,7 @@ namespace EPP.CorporatePortal.Application
                 {
                     var dt = storedProcService.GetFileUploadById(Convert.ToInt32(id));
                     //If record exists and is the same corpid as requested. Check file's PolicySourceId with user's policy access list.
-                    var policies = CommonEntities.LoadPolicies(bizRegNo, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner);
+                    var policies = CommonEntities.LoadPolicies(bizRegNo, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner, UCorpId);
                     var policyList = policies.AsEnumerable().Select(s => s["ContractNo"].ToString()).Distinct().ToList();
 
                     if (dt.Rows.Count > 0 && policyList.Contains(dt.Rows[0]["PolicySourceId"].ToString()))

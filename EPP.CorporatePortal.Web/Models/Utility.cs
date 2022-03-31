@@ -140,10 +140,18 @@ namespace EPP.CorporatePortal.Models
                 SmtpClient smtp = new SmtpClient();
                 message.From = new MailAddress(SenderEmail);
                 message.To.Add(new MailAddress(data.Item1));
+            
+
                 if (!string.IsNullOrEmpty(Bcc))
                 {
-                    message.Bcc.Add(new MailAddress(Bcc));
-                }           
+                    List<string> GetBCC = Bcc.Split(';').ToList();
+
+                    for (int x = 0; x < GetBCC.Count(); x++)
+                    {
+                        message.Bcc.Add(new MailAddress(GetBCC[x]));
+                    }          
+                }       
+                
                 message.Subject = subject;
                 message.IsBodyHtml = true; //to make message body as html  
                 message.Body = htmlString;

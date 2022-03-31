@@ -5,6 +5,7 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <asp:HiddenField   ClientIDMode="Static" ID="hdnCorpId" value="" runat="server"/>
+    <asp:HiddenField   ClientIDMode="Static" ID="hdnUCorpId" value="" runat="server"/>
     <div class="page-heading ">
 
         <div class="row-wrap">
@@ -13,7 +14,7 @@
 
             <div class="btn-wrapper">
 
-                <a href="<%# ResolveUrl("~/Application/ClaimNewMember.aspx?&CorpId=" + Utility.Encrypt(hdnCorpId.Value)) %>" class="btn btn-primary">+ Submit New Claims
+                <a href="<%# ResolveUrl("~/Application/ClaimNewMember.aspx?&CorpId=" + Utility.Encrypt(hdnCorpId.Value) + "&UCorpId="+Utility.Encrypt(hdnUCorpId.Value)) %>" class="btn btn-primary">+ Submit New Claims
                 </a>
 
                 <a href="#" class="btn btn-noborder" data-toggle="modal" data-target="#downloadReport">Download
@@ -132,8 +133,8 @@
                                     <td class="actionList" id="colAction<%# Eval("Id") %>">
                                         <div class="threeDots" onmouseover="view(<%# Eval("Id") %>)"></div>
                                         <ul id="action<%# Eval("Id") %>" style="display: none;">
-                                            <li><a href='<%= ResolveUrl("~/Application/DownloadFile.ashx") %>?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.ClaimsEForm.ToString() %>' target="_blank">Download Claim Form</a></li>
-                                            <li><a href='<%= ResolveUrl("~/Application/ClaimDetails.aspx?&CorpId=" + Utility.Encrypt(hdnCorpId.Value)) %>&MemberClaimsId=<%# Utility.Encrypt(Eval("Id").ToString()) %>'>View Claim Details</a></li>
+                                            <li><a href='<%= ResolveUrl("~/Application/DownloadFile.ashx") %>?id=<%# Eval("Id").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.ClaimsEForm.ToString() %>&UCorpId=<%#hdnUCorpId.Value.ToString()%>' target="_blank">Download Claim Form</a></li>
+                                            <li><a href='<%= ResolveUrl("~/Application/ClaimDetails.aspx?&CorpId=" + Utility.Encrypt(hdnCorpId.Value)) %>&UCorpId=<%# Utility.Encrypt(hdnUCorpId.Value) %>&MemberClaimsId=<%# Utility.Encrypt(Eval("Id").ToString()) %>'>View Claim Details</a></li>
                                             <%--<li>Remove This Claim</li>--%>
                                         </ul>
                                     </td>

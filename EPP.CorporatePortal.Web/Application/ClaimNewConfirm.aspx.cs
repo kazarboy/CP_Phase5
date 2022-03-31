@@ -41,6 +41,7 @@ namespace EPP.CorporatePortal.Application
             }
 
             var newCorpId = Request.QueryString["CorpId"] ?? "0";
+            var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
 
             if (!Page.IsPostBack)
             {
@@ -49,9 +50,11 @@ namespace EPP.CorporatePortal.Application
                 try
                 {
                     HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
+                    HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
                     hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                    hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
 
-                    var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId);
+                    var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId);
                     HiddenField hdnExitURL = (HiddenField)Page.Master.FindControl("hdnExitURL");
                     hdnExitURL.Value = exitURL;
 
@@ -64,7 +67,7 @@ namespace EPP.CorporatePortal.Application
                     CommonEntities.ClaimProcessSteps(2, Common.Enums.ClaimStepsStatus.complete.ToString(), false, "", this, userName);
                     CommonEntities.ClaimProcessSteps(3, Common.Enums.ClaimStepsStatus.complete.ToString(), false, "", this, userName);
                     CommonEntities.ClaimProcessSteps(4, Common.Enums.ClaimStepsStatus.complete.ToString(), false, "", this, userName);
-                    CommonEntities.ClaimProcessSteps(5, Common.Enums.ClaimStepsStatus.complete.ToString(), true, ResolveUrl("~/Application/ClaimNewDocument.aspx?&CorpId=" + newCorpId + "&Return=1"), this, userName);
+                    CommonEntities.ClaimProcessSteps(5, Common.Enums.ClaimStepsStatus.complete.ToString(), true, ResolveUrl("~/Application/ClaimNewDocument.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId + "&Return=1"), this, userName);
                     CommonEntities.ClaimProcessSteps(6, Common.Enums.ClaimStepsStatus.active.ToString(), false, "", this, userName);
 
                     //Load claims                
@@ -150,7 +153,7 @@ namespace EPP.CorporatePortal.Application
                 spanSubmitterName.InnerText = _UserIdentityModel.Name;
                 spanSubmitterEmail.InnerText = _UserIdentityModel.Email;
                 spanSubmitterContactNo.InnerText = _UserIdentityModel.MobileNumber;
-                spanSubmitterROC.InnerText = _UserIdentityModel.BusinessRegistrationNo;
+                spanSubmitterROC.InnerText = _UserIdentityModel.ParentBizRegNo;//_UserIdentityModel.BusinessRegistrationNo;
                 spanSubmitterCompany.InnerText = _UserIdentityModel.ParentCorporate;
 
                 //TnC, based on the 1st policy's Entity type
@@ -158,7 +161,7 @@ namespace EPP.CorporatePortal.Application
 
                 if (policy != null)
                 {
-                    var drPolicy = service.GetPolicyDetails(policy.PolicyID, _UserIdentityModel.BusinessRegistrationNo).AsEnumerable().FirstOrDefault();
+                    var drPolicy = service.GetPolicyDetails(policy.PolicyID, _UserIdentityModel.BusinessRegistrationNo, _UserIdentityModel.UCorpId).AsEnumerable().FirstOrDefault();
 
                     if (drPolicy != null && drPolicy["Entity"] != null && drPolicy["Entity"].ToString() == "ETB")
                     {
@@ -196,7 +199,7 @@ namespace EPP.CorporatePortal.Application
 
                     if (hdnPolicyIdCurr != null)
                     {
-                        var drPolicy = service.GetPolicyDetails(hdnPolicyIdCurr.Value, _UserIdentityModel.BusinessRegistrationNo).AsEnumerable().First();
+                        var drPolicy = service.GetPolicyDetails(hdnPolicyIdCurr.Value, _UserIdentityModel.BusinessRegistrationNo, _UserIdentityModel.UCorpId).AsEnumerable().First();
 
                         spanPolicyName.InnerText = drPolicy["ProductName"].ToString();
                         spanPolicyNo.InnerText = drPolicy["ContractNo"].ToString();
@@ -384,7 +387,7 @@ namespace EPP.CorporatePortal.Application
 
                 docEFTB.UploadedDocList = sbDocList.ToString();
 
-                var drPolicy = service.GetPolicyDetails(policy.PolicyID, _UserIdentityModel.BusinessRegistrationNo).AsEnumerable().FirstOrDefault();
+                var drPolicy = service.GetPolicyDetails(policy.PolicyID, _UserIdentityModel.BusinessRegistrationNo, _UserIdentityModel.UCorpId).AsEnumerable().FirstOrDefault();
 
                 docEFTB.ContractNo = drPolicy["ContractNo"] != null ? drPolicy["ContractNo"].ToString() : string.Empty;
 
@@ -443,7 +446,7 @@ namespace EPP.CorporatePortal.Application
                 {
                     TextWriter tw = new StreamWriter(ms);
 
-                    var drPolicy = service.GetPolicyDetails(dr["PolicyId"].ToString(), _UserIdentityModel.BusinessRegistrationNo).AsEnumerable().FirstOrDefault();
+                    var drPolicy = service.GetPolicyDetails(dr["PolicyId"].ToString(), _UserIdentityModel.BusinessRegistrationNo, _UserIdentityModel.UCorpId).AsEnumerable().FirstOrDefault();
 
                     var BussCat = string.Empty;
                     var PolicyNo = string.Empty;
@@ -742,8 +745,10 @@ namespace EPP.CorporatePortal.Application
 
                 HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
                 var corpID = Utility.Encrypt(hdnCorpId.Value);
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
+                var UCorpId = Utility.Encrypt(hdnUCorpId.Value);
 
-                Response.Redirect(ResolveUrl("~/Application/ClaimNewSuccess.aspx?&CorpId=" + corpID));
+                Response.Redirect(ResolveUrl("~/Application/ClaimNewSuccess.aspx?&CorpId=" + corpID + "&UCorpId=" + UCorpId));
             }
             catch (Exception ex)
             {

@@ -21,20 +21,30 @@ namespace EPP.CorporatePortal.Application
 
             string userName = ((CorporatePortalSite)this.Master)._UserIdentityModel.PrincipalName;
             string isowner = ((CorporatePortalSite)this.Master)._UserIdentityModel.IsOwner;
+            var parentCorporate = ((CorporatePortalSite)this.Master)._UserIdentityModel.ParentCorporate;
+            var parentBizRegNo = ((CorporatePortalSite)this.Master)._UserIdentityModel.ParentBizRegNo;
+
             try
             {
                 var newCorpId = Request.QueryString["CorpId"] ?? "0";
+                var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
 
-                //temporary disable
-                //if (newCorpId != "" && newCorpId != "0")
-                //{
-                //    hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
-                //}
-                //else
-                //{
-                //    var bizRegNo = new StoredProcService(userName).GetCorporateByUserName(userName);
-                //    hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(bizRegNo);
-                //}
+                if (newCorpId != "" && newCorpId != "0")
+                {
+                    hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                    hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
+                }
+                else
+                {
+                    var storedProcServ = new StoredProcService(userName);
+                    var uid = storedProcServ.GetCorporateUId(parentBizRegNo, parentCorporate);
+                    var UCorpId = uid.Rows[0]["Id"].ToString();
+
+                    var bizRegNo = new StoredProcService(userName).GetCorporateByUserName(userName, UCorpId);
+
+                    hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(bizRegNo.Rows[0]["Id"].ToString());
+                    hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(UCorpId);
+                }
 
                 var memberClaimsId = Request.QueryString["MemberClaimsId"] ?? "0";
                 if (memberClaimsId != "" && memberClaimsId != "0")
@@ -156,11 +166,11 @@ namespace EPP.CorporatePortal.Application
                     spanClaimLetter.InnerText = "-";
 
 
-                    var dtPolicy = service.GetPolicyDetails(dtMemberClaims.Rows[0]["PolicyId"].ToString(), hdnCorpId.Value);
+                    var dtPolicy = service.GetPolicyDetails(dtMemberClaims.Rows[0]["PolicyId"].ToString(), hdnCorpId.Value, hdnUCorpId.Value);
                     if (dtPolicy.Rows.Count > 0)
                     {
                         spanPolicyName.InnerText = dtPolicy.Rows[0]["ProductName"].ToString();
-                        spanPolicyNo.InnerText = dtPolicy.Rows[0]["ContractNo"].ToString();
+                        spanPolicyNo.InnerText = dtPolicy.Rows[0]["ContractNo"].ToString(); 
                     }
 
 
@@ -244,8 +254,7 @@ namespace EPP.CorporatePortal.Application
 
             try
             {              
-
-                Response.Redirect(ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + hdnCorpId.Value));
+                Response.Redirect(ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + hdnCorpId.Value + "&UCorpId=" + hdnUCorpId.Value));
             }
             catch (Exception ex)
             {

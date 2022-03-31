@@ -38,14 +38,17 @@ namespace EPP.CorporatePortal.Application
             var userName = _UserIdentityModel.PrincipalName;
 
             var newCorpId = Request.QueryString["CorpId"] ?? "0";
+            var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
             var returnIndicator = Request.QueryString["Return"] ?? "0";
 
             try
             {
                 HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
                 hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
 
-                var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId);
+                var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId="+newCorpId+"&UCorpId=" +newUCorpId);
                 HiddenField hdnExitURL = (HiddenField)Page.Master.FindControl("hdnExitURL");
                 hdnExitURL.Value = exitURL;
 
@@ -121,15 +124,18 @@ namespace EPP.CorporatePortal.Application
             try
             {
                 HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
+                
                 var corpID = Utility.Encrypt(hdnCorpId.Value);
+                var UCorpId = Utility.Encrypt(hdnUCorpId.Value);
 
                 //load menu
-                DataTable dt = service.GetClaimsMemberList(searchString, searchType);
+                DataTable dt = service.GetClaimsMemberList(searchString, searchType, hdnUCorpId.Value);
                 //To filter out only showing those which valid for logged in PIC
                 if (dt.Rows.Count > 0)
                 {
                     //Filter FileUpload lists to only those user has access to. PIC/Owner only
-                    var policies = CommonEntities.LoadPolicies(corpID, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner);
+                    var policies = CommonEntities.LoadPolicies(corpID, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner, UCorpId);
                     var policyList = policies.AsEnumerable().Select(s => s["ContractNo"].ToString()).Distinct().ToList();
                     var dtFiltered = dt.AsEnumerable().Where(w => policyList.Contains(w["ContractNo"].ToString()));
 
@@ -155,8 +161,11 @@ namespace EPP.CorporatePortal.Application
 
             try
             {
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
+                var UCorpId = Utility.Encrypt(hdnUCorpId.Value);
+
                 //Validations
-                DataTable dt = service.GetClaimsMemberList(txtMemberIDNo.Text, selectKeyInMemberIDType.Value);
+                DataTable dt = service.GetClaimsMemberList(txtMemberIDNo.Text, selectKeyInMemberIDType.Value, Utility.EncodeAndDecryptCorpId(UCorpId));
                 //To filter out only showing those which valid for logged in PIC
                 if (dt.Rows.Count > 0)
                 {
@@ -235,7 +244,7 @@ namespace EPP.CorporatePortal.Application
 
                 auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Info, _UserIdentityModel.PrincipalName, string.Format("Member Selected: [exist={0}||icno={1}]", radioChecked.ToString(), !string.IsNullOrEmpty(_ClaimSubmissionModel.MemberID) ? _ClaimSubmissionModel.MemberID : _ClaimSubmissionModel.MemberIDNoKeyIn), "ClaimNewMember");
 
-                Response.Redirect(ResolveUrl("~/Application/ClaimNewClaim.aspx?&CorpId=" + corpID));
+                Response.Redirect(ResolveUrl("~/Application/ClaimNewClaim.aspx?&CorpId="+corpID+"&UCorpId="+UCorpId));
             }
             catch (Exception ex)
             {

@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-md-8">
                         <span id="spanPolicyNo" runat="server"></span>
-                        <a href='<%= ResolveUrl("~/Application/DownloadFile.ashx") %>?id=<%# Eval("MemberClaimID").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.ClaimsEForm.ToString() %>' target="_blank" class="btn btnDownload">Download the claim form</a>
+                        <a href='<%= ResolveUrl("~/Application/DownloadFile.ashx") %>?id=<%# Eval("MemberClaimID").ToString() %>&type=<%# EPP.CorporatePortal.Common.Enums.FileDownloadType.ClaimsEForm.ToString() %>&UCorpId=<%# Eval("UCorpId").ToString() %>' target="_blank" class="btn btnDownload">Download the claim form</a>
                         <%--<a href="#">
                                 <button class="btn btnDownload">Download the claim form</button></a>--%>
                     </div>

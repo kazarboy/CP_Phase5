@@ -115,7 +115,7 @@ namespace EPP.CorporatePortal.DAL.Service
             return dt;
         }
 
-        public DataTable GetCorporateSubsidaries(string corporateParentId)
+        public DataTable GetCorporateSubsidaries(string corporateParentId, string corporateparentBizRegNo)
         {
             var dt = new DataTable();
             try
@@ -127,6 +127,7 @@ namespace EPP.CorporatePortal.DAL.Service
                     CommandText = "spGetCorporateSubsidaries"
                 };
                 cmd.Parameters.Add("@CorporateParentId", SqlDbType.NVarChar).Value = corporateParentId;
+                cmd.Parameters.Add("@CorporateparentBizRegNo", SqlDbType.NVarChar).Value = corporateparentBizRegNo;
 
                 using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
                 {
@@ -594,7 +595,7 @@ namespace EPP.CorporatePortal.DAL.Service
             }
             return dt;
         }
-        public DataTable GetClaimsMemberList(string searchString, string searchType)
+        public DataTable GetClaimsMemberList(string searchString, string searchType,string UCorpId)
         {
 
             var dt = new DataTable();
@@ -608,6 +609,7 @@ namespace EPP.CorporatePortal.DAL.Service
                 };
                 cmd.Parameters.Add("@SearchString", SqlDbType.VarChar).Value = searchString;
                 cmd.Parameters.Add("@SearchType", SqlDbType.VarChar).Value = searchType;
+                cmd.Parameters.Add("@UCorpId", SqlDbType.VarChar).Value = UCorpId;
 
                 using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
                 {
@@ -722,7 +724,7 @@ namespace EPP.CorporatePortal.DAL.Service
             }
             return dt.Rows.Count>0;
         }
-        public string GetBusinessRegistrationNo(string corporateName)
+        public DataTable GetBusinessRegistrationNo(string corporateName)
         {
             var dt = new DataTable();
             try
@@ -744,7 +746,8 @@ namespace EPP.CorporatePortal.DAL.Service
             {
                 auditTrailService.LogAuditTrail(DateTime.Now, AuditType.Error, UserName, "Error in GetBusinessRegistrationNo. Error : " + ex.Message, "StoredProcService");
             }
-            return dt.Rows[0]["BusinessRegistrationNo"].ToString();
+            //return dt.Rows[0]["BusinessRegistrationNo"].ToString();
+            return dt;
         }
 
         public DataTable GetAllCorporates()
@@ -796,7 +799,7 @@ namespace EPP.CorporatePortal.DAL.Service
             }
             return dt;
         }
-        public DataTable GetPolicyByOwnership(string corporateId, string owner)
+        public DataTable GetPolicyByOwnership(string corporateId, string owner, string UCorpId)
         {
             var dt = new DataTable();
             try
@@ -809,6 +812,8 @@ namespace EPP.CorporatePortal.DAL.Service
                 };
                 cmd.Parameters.Add("@CorporateId", SqlDbType.NVarChar).Value = corporateId;
                 cmd.Parameters.Add("@Owner", SqlDbType.VarChar).Value = owner;
+                cmd.Parameters.Add("@UCorpId", SqlDbType.VarChar).Value = UCorpId;
+
                 using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
                 {
                     sda.Fill(dt);
@@ -1557,7 +1562,7 @@ namespace EPP.CorporatePortal.DAL.Service
             }
         }
 
-        public DataTable GetPolicyDetails(string policyId, string corporateId,string UCorpId = null)
+        public DataTable GetPolicyDetails(string policyId, string corporateId,string UCorpId)
         {
             var dt = new DataTable();
             try

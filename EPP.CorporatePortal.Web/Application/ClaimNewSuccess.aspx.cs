@@ -36,11 +36,16 @@ namespace EPP.CorporatePortal.Application
                 try
                 {
                     var newCorpId = Request.QueryString["CorpId"] ?? "0";
+                    var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
 
                     HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
+                    HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
                     hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                    hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
 
-                    var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId);
+                    var UCorpId = Utility.EncodeAndDecryptCorpId(newUCorpId);
+
+                    var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId);
                     HiddenField hdnExitURL = (HiddenField)Page.Master.FindControl("hdnExitURL");
                     hdnExitURL.Value = exitURL;
 
@@ -63,7 +68,7 @@ namespace EPP.CorporatePortal.Application
                     }
 
                     //Load claims                
-                    LoadAllList(_UserIdentityModel.BusinessRegistrationNo, _ClaimSubmissionModel.MemberID, userName);
+                    LoadAllList(_UserIdentityModel.BusinessRegistrationNo, _ClaimSubmissionModel.MemberID, userName, UCorpId);
                 }
                 catch (Exception ex)
                 {
@@ -71,7 +76,7 @@ namespace EPP.CorporatePortal.Application
                 }
             }
         }
-        private void LoadAllList(string CorpId, string memberId, string userName)
+        private void LoadAllList(string CorpId, string memberId, string userName,string UCorpId)
         {
             auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Info, userName, "LoadAllList: Started", "ClaimNewSuccess");
 
@@ -133,6 +138,7 @@ namespace EPP.CorporatePortal.Application
                 spanClaimDateofEvent.InnerText = new DateTime(Convert.ToInt32(claimObject.YearOfEvent), Convert.ToInt32(claimObject.MonthOfEvent), Convert.ToInt32(claimObject.DayOfEvent)).ToString("dd MMMM yyyy");
 
                 //Policy Details
+                claimObject.PolicyList[0].UCorpId = UCorpId;
                 rptPolicyBankList.DataSource = claimObject.PolicyList;
                 rptPolicyBankList.DataBind();
                 ProcessPolicyBankRepeater(userName);
@@ -146,7 +152,7 @@ namespace EPP.CorporatePortal.Application
                 spanSubmitterName.InnerText = _UserIdentityModel.Name;
                 spanSubmitterEmail.InnerText = _UserIdentityModel.Email;
                 spanSubmitterContactNo.InnerText = _UserIdentityModel.MobileNumber;
-                spanSubmitterROC.InnerText = _UserIdentityModel.BusinessRegistrationNo;
+                spanSubmitterROC.InnerText = _UserIdentityModel.ParentBizRegNo;//_UserIdentityModel.BusinessRegistrationNo;
                 spanSubmitterCompany.InnerText = _UserIdentityModel.ParentCorporate;
             }
             catch (Exception ex)
@@ -172,7 +178,7 @@ namespace EPP.CorporatePortal.Application
 
                     if (hdnPolicyIdCurr != null)
                     {
-                        var drPolicy = service.GetPolicyDetails(hdnPolicyIdCurr.Value, _UserIdentityModel.BusinessRegistrationNo).AsEnumerable().First();
+                        var drPolicy = service.GetPolicyDetails(hdnPolicyIdCurr.Value, _UserIdentityModel.BusinessRegistrationNo, _UserIdentityModel.UCorpId).AsEnumerable().First();
 
                         spanPolicyName.InnerText = drPolicy["ProductName"].ToString();
                         spanPolicyNo.InnerText = drPolicy["ContractNo"].ToString();
@@ -282,8 +288,10 @@ namespace EPP.CorporatePortal.Application
             {
                 HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
                 var corpID = Utility.Encrypt(hdnCorpId.Value);
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
+                var UCorpId = Utility.Encrypt(hdnUCorpId.Value);
 
-                Response.Redirect(ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + corpID));
+                Response.Redirect(ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + corpID + "&UCorpId=" + UCorpId));
             }
             catch (Exception ex)
             {

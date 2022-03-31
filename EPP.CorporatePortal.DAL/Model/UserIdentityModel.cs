@@ -33,5 +33,6 @@ namespace EPP.CorporatePortal.DAL.Model
         public string IsOwner { get; set; }
         public string Role { get; set; }
         public string UCorpId { get; set; }
+        public string ParentUCorpId { get; set; }
     }
 }

@@ -10,6 +10,7 @@
         </div>
     </div>
     <asp:HiddenField ClientIDMode="Static" ID="hdnCorpId" Value="" runat="server" />
+    <asp:HiddenField ClientIDMode="Static" ID="hdnUCorpId" value="" runat="server"/>
     <asp:HiddenField ClientIDMode="Static" ID="hdnMemberClaimsId" Value="" runat="server" />
     <div class="page-content">
         <div class="tab">

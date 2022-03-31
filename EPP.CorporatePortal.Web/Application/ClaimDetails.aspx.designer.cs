@@ -22,6 +22,15 @@ namespace EPP.CorporatePortal.Application {
         protected global::System.Web.UI.WebControls.HiddenField hdnCorpId;
         
         /// <summary>
+        /// hdnUCorpId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnUCorpId;
+        
+        /// <summary>
         /// hdnMemberClaimsId control.
         /// </summary>
         /// <remarks>

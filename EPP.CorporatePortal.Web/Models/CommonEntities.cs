@@ -15,7 +15,7 @@ namespace EPP.CorporatePortal.Models
 {
     public static class CommonEntities
     {
-        public static DataTable LoadPolicies(string corporateId, string userName, string isOwnerClaim, string UcorpId = null)
+        public static DataTable LoadPolicies(string corporateId, string userName, string isOwnerClaim, string UcorpId)
         {
             var decryptedCorpId = Utility.EncodeAndDecryptCorpId(corporateId);
             var decryptedUCorpId = Utility.EncodeAndDecryptCorpId(UcorpId);
@@ -31,7 +31,7 @@ namespace EPP.CorporatePortal.Models
             else //get only owned policies
             {
                 //Need to add  UcorpId******
-                policies = service.GetPolicyByOwnership(decryptedCorpId, userName);
+                policies = service.GetPolicyByOwnership(decryptedCorpId, userName, decryptedUCorpId);
             }
             //Encrypt the PolicyID  
 

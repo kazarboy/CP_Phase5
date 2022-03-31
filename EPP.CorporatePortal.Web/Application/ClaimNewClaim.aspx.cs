@@ -32,15 +32,18 @@ namespace EPP.CorporatePortal.Application
             var userName = _UserIdentityModel.PrincipalName;
 
             var newCorpId = Request.QueryString["CorpId"] ?? "0";
+            var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
 
             var returnIndicator = Request.QueryString["Return"] ?? "0";
 
             try
             {
                 HiddenField hdnCorpId = (HiddenField)Page.Master.FindControl("hdnCorpId");
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
                 hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
 
-                var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId);
+                var exitURL = ResolveUrl("~/Application/ClaimListing.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId);
                 HiddenField hdnExitURL = (HiddenField)Page.Master.FindControl("hdnExitURL");
                 hdnExitURL.Value = exitURL;
 
@@ -49,7 +52,7 @@ namespace EPP.CorporatePortal.Application
                 hdnPermission.Value = Enum.GetName(typeof(Rights_Enum), accessPermission);
 
                 //Step Processing
-                CommonEntities.ClaimProcessSteps(1, Common.Enums.ClaimStepsStatus.complete.ToString(), true, ResolveUrl("~/Application/ClaimNewMember.aspx?&CorpId=" + newCorpId + "&Return=1"), this, userName);
+                CommonEntities.ClaimProcessSteps(1, Common.Enums.ClaimStepsStatus.complete.ToString(), true, ResolveUrl("~/Application/ClaimNewMember.aspx?&CorpId=" + newCorpId + "&UCorpId=" + newUCorpId + "&Return=1"), this, userName);
                 CommonEntities.ClaimProcessSteps(2, Common.Enums.ClaimStepsStatus.active.ToString(), false, "", this, userName);
                 CommonEntities.ClaimProcessSteps(3, Common.Enums.ClaimStepsStatus.disabled.ToString(), false, "", this, userName);
                 CommonEntities.ClaimProcessSteps(4, Common.Enums.ClaimStepsStatus.disabled.ToString(), false, "", this, userName);
@@ -195,6 +198,20 @@ namespace EPP.CorporatePortal.Application
                     auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "List contains DTH Claim Type", "ClaimNewClaim");
                 }
 
+                var containsPPD= dt.AsEnumerable().Where(w => w["BenefitCode"].ToString() == "PPD").Any();
+                if (containsPPD)
+                {
+                    hdnContainsDTH.Value = "PPD";
+                    auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "List contains PPD Claim Type", "ClaimNewClaim");
+                }
+
+                var containsPTD = dt.AsEnumerable().Where(w => w["BenefitCode"].ToString() == "PTD").Any();
+                if (containsPTD)
+                {
+                    hdnContainsDTH.Value = "PTD";
+                    auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Debug, userName, "List contains PTD Claim Type", "ClaimNewClaim");
+                }
+
                 try
                 {
                     //Check if contains both Funeral and Death Benefits
@@ -267,6 +284,7 @@ namespace EPP.CorporatePortal.Application
                 }
 
                 ClaimListChangeLogic(dtBenefitGroup);
+                ClaimListChangeLogic(dtBenefitGroup);
             }
             catch (Exception ex)
             {
@@ -320,6 +338,7 @@ namespace EPP.CorporatePortal.Application
         {
             try
             {
+
                 ClaimSubmissionModel _ClaimSubmissionModel = new ClaimSubmissionModel();
 
                 if (Session["ClaimSubmissionModel"] != null)
@@ -434,8 +453,10 @@ namespace EPP.CorporatePortal.Application
                 auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Info, _UserIdentityModel.PrincipalName, string.Format("Claim Selected: [BenefitCode={0}||OriBenefitCode={1}]", _ClaimSubmissionModel.BenefitCode, _ClaimSubmissionModel.BenefitCodeOri), "ClaimNewClaim");
 
                 var corpID = Utility.Encrypt(hdnCorpId.Value);
+                HiddenField hdnUCorpId = (HiddenField)Page.Master.FindControl("hdnUCorpId");
+                var UCorpId = Utility.Encrypt(hdnUCorpId.Value);
 
-                Response.Redirect(ResolveUrl("~/Application/ClaimNewPolicy.aspx?&CorpId=" + corpID));
+                Response.Redirect(ResolveUrl("~/Application/ClaimNewPolicy.aspx?&CorpId=" + corpID + "&UCorpId=" + UCorpId));
             }
             catch (Exception ex)
             {

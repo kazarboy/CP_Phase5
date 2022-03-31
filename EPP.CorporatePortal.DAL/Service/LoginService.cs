@@ -977,6 +977,7 @@ namespace EPP.CorporatePortal.DAL.Service
             identityModel.ParentBizRegNo = userCorporates[0].SourceId ?? "";
             identityModel.IsOwner = userCorporates[0].IsOwner ? "true" : "false";
             identityModel.UCorpId = "";
+            identityModel.ParentUCorpId = userCorporates[0].Id.ToString() ?? "";
 
             var roles = new RolesService().GetUserRoles(userName);
             foreach (var role in roles)
@@ -1000,7 +1001,8 @@ namespace EPP.CorporatePortal.DAL.Service
                     Name = Convert.ToString(drow["Name"]),
                     ParentId = drow["ParentId"].ToString(),
                     Description = Convert.ToString(drow["Description"]),
-                    IsOwner = Convert.ToBoolean(drow["IsOwner"])
+                    IsOwner = Convert.ToBoolean(drow["IsOwner"]),
+                    Id = Convert.ToInt32(drow["Id"])
                 };
                 list.Add(corp);
             }
@@ -1043,7 +1045,9 @@ namespace EPP.CorporatePortal.DAL.Service
             
             //currsession.Name = newName;
             var newBusinessRegistrationNo = GetBusinessRegistrationNo(userName, newName);
-            currsession.BusinessRegistrationNo = newBusinessRegistrationNo;
+            //currsession.BusinessRegistrationNo = newBusinessRegistrationNo;
+            currsession.BusinessRegistrationNo = newBusinessRegistrationNo.Rows[0]["BusinessRegistrationNo"].ToString();
+            currsession.UCorpId = newBusinessRegistrationNo.Rows[0]["UCorpId"].ToString();
 
             return currsession;
 
@@ -1056,7 +1060,7 @@ namespace EPP.CorporatePortal.DAL.Service
         /// </summary>
         /// <param name="parentName"></param>
         /// <returns>Business Registration No</returns>
-        private string GetBusinessRegistrationNo(string userName, string parentName)
+        private DataTable GetBusinessRegistrationNo(string userName, string parentName)
         {
             //var user = HttpContext.Current.User as ClaimsPrincipal;
             //var identity = user.Identity as ClaimsIdentity;

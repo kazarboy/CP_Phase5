@@ -34,6 +34,7 @@ namespace EPP.CorporatePortal.Application
         }
         private AuditTrail auditTrailService = new AuditTrail();
         private UserIdentityModel _UserIdentityModel = new UserIdentityModel();
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session[ConfigurationManager.AppSettings["SessionVariableName"]] != null)
@@ -45,10 +46,12 @@ namespace EPP.CorporatePortal.Application
             var userName = _UserIdentityModel.PrincipalName;
 
             var newCorpId = Request.QueryString["CorpId"] ?? "0";
+            var newUCorpId = Request.QueryString["UCorpId"] ?? "0";
 
             try
             {
                 hdnCorpId.Value = Utility.EncodeAndDecryptCorpId(newCorpId);
+                hdnUCorpId.Value = Utility.EncodeAndDecryptCorpId(newUCorpId);
 
                 var accessPermission = Rights_Enum.ManageClaim;
                 HiddenField hdnPermission = (HiddenField)Page.Master.FindControl("hdnPermission");
@@ -204,6 +207,7 @@ namespace EPP.CorporatePortal.Application
                 DataTable dt = service.GetClaimsList(userName);
 
                 var corpID = Utility.Encrypt(hdnCorpId.Value);
+                var UcorpID = Utility.Encrypt(hdnUCorpId.Value);
 
                 //To change/map out CGLS Status to Portal Status
                 if (dt.Rows.Count > 0)
@@ -218,7 +222,7 @@ namespace EPP.CorporatePortal.Application
                 if (dt.Rows.Count > 0)
                 {
                     //Filter Claims lists to only those user has access to. PIC/Owner only
-                    var policies = CommonEntities.LoadPolicies(corpID, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner);
+                    var policies = CommonEntities.LoadPolicies(corpID, _UserIdentityModel.PrincipalName, _UserIdentityModel.IsOwner,UcorpID);
                     var policyList = policies.AsEnumerable().Select(s => s["ContractNo"].ToString()).Distinct().ToList();
                     var dtFiltered = dt.AsEnumerable().Where(w => policyList.Contains(w["ContractNo"].ToString()));
 
@@ -229,9 +233,9 @@ namespace EPP.CorporatePortal.Application
                 }
 
                 btnInProgressStatus.Text = "In Progress (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("In Progress")).Count().ToString() + ")";
-                btnPendingStatus.Text = "Pending (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("Pending")).Count().ToString() + ")";
+                btnPendingStatus.Text = "Pending (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("Pending Approval")).Count().ToString() + ")";
                 btnApprovedStatus.Text = "Approved (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("Approved")).Count().ToString() + ")";
-                btnFullyPaidStatus.Text = "Fully Paid (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("Fully Paid")).Count().ToString() + ")";
+                btnFullyPaidStatus.Text = "Fully Paid (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("Paid")).Count().ToString() + ")";
                 btnRejectedStatus.Text = "Rejected (" + dt.AsEnumerable().Where(row => row["ClaimStatus"].ToString().Equals("Rejected")).Count().ToString() + ")";
 
                 //Filter according to status if chosen

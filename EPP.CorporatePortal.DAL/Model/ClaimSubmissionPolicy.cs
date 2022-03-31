@@ -20,5 +20,6 @@ namespace EPP.CorporatePortal.DAL.Model
         public string EmailAddress { get; set; }
         public string BankROC { get; set; }
         public int MemberClaimID { get; set; }
+        public string UCorpId { get; set; }
     }
 }

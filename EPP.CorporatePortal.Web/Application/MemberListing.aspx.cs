@@ -42,23 +42,11 @@ namespace EPP.CorporatePortal.Application
             var userName = ((CorporatePortalSite)this.Master)._UserIdentityModel.PrincipalName;
             //var bizRegNo = identity.Claims.Where(c => c.Type == "BusinessRegistrationNo").Select(c => c.Value).SingleOrDefault();
             var bizRegNo = ((CorporatePortalSite)this.Master)._UserIdentityModel.BusinessRegistrationNo;
-            var parentCorporate = ((CorporatePortalSite)this.Master)._UserIdentityModel.ParentCorporate;
 
             try
             {
                 CorporateId = Utility.EncodeAndDecryptCorpId(corpId);
                 UCorporateId = Utility.EncodeAndDecryptCorpId(UCorpId);
-
-                if (corpId == null && UCorpId == null)
-                {
-                    var service = new CorporateService();
-                    CorporateId = service.GetParentId(bizRegNo);
-
-                    var storedProcServ = new StoredProcService(userName);
-                    var uid = storedProcServ.GetCorporateUId(bizRegNo, parentCorporate);
-                    UCorporateId = uid.Rows[0]["Id"].ToString();
-                }
-
 
                 hdnROC.Value = bizRegNo;
 
@@ -74,7 +62,7 @@ namespace EPP.CorporatePortal.Application
                     hdnPolicyChecker.Value = PolicyChecker.ToString();
                 }
 
-                LoadUploadHistory(userName, CorporateId);
+                LoadUploadHistory(userName, CorporateId, UCorporateId);
 
                 DLTemplate = db.dbEntities.SystemConfigs.Where(x => x.Setting == "DLTemplate").Select(x => x.Value).Single().ToString();
 
@@ -104,6 +92,7 @@ namespace EPP.CorporatePortal.Application
             var author = ((CorporatePortalSite)this.Master)._UserIdentityModel.PrincipalName;
             //string ROC = identity.Claims.Where(c => c.Type == "BusinessRegistrationNo").Select(c => c.Value).SingleOrDefault();
             string ROC = ((CorporatePortalSite)this.Master)._UserIdentityModel.BusinessRegistrationNo;
+            string UCorpId = ((CorporatePortalSite)this.Master)._UserIdentityModel.UCorpId;
 
             string baseUploadFilesPath = ConfigurationManager.AppSettings["BaseUploadFilesPath"];
             string directory = ConstructDirectory(baseUploadFilesPath, ROC, contractNo, version);
@@ -273,31 +262,6 @@ namespace EPP.CorporatePortal.Application
                         throw;
                     }
 
-                    //try
-                    //{
-                    //    //Checks if there is any null value, if yes then prompt error
-                    //    if (rpaTable.Columns.Contains("*Relationship With Member"))
-                    //    {
-                    //        var NoCount = rpaTable.AsEnumerable().Where(w1 => !string.IsNullOrEmpty(w1["*Relationship With Member"].ToString())).Select(s => s["*Relationship With Member"]).ToList();
-
-                    //        var NullCount = rpaTable.AsEnumerable().Where(w1 => string.IsNullOrEmpty(w1["*Relationship With Member"].ToString())).Select(s => s["*Relationship With Member"]).ToList();
-                    //        if (NullCount.Any())
-                    //        {
-                    //            File.Delete(localPath);
-                    //            var alertMessage = String.Format("alert('*MANDATORY FIELD RELATIONSHIP WITH MEMBER: {0}{2}{1}');", NullCount.Count, string.Join(", ", NullCount), @"\n");
-                    //            Utility.RegisterStartupScriptHandling(this, "Error", alertMessage, true, true, author);
-                    //            btnUpload.Enabled = true;
-                    //            return;
-                    //        }
-                    //    }
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    File.Delete(localPath);
-                    //    auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, author, "Error in checkRelationshipMandatory: " + ex.Message, "MemberListing");
-                    //    throw;
-                    //}
-
                     try
                     {
                         //Get Record Counts of data given to RPA. To be saved in database and used later for validation.
@@ -371,7 +335,7 @@ namespace EPP.CorporatePortal.Application
                 }
 
                 auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Info, author, "File Upload: Reload upload history", "MemberListing");
-                LoadUploadHistory(author, CorporateId);//Reload the history
+                LoadUploadHistory(author, CorporateId, UCorpId);//Reload the history
                 auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Info, author, "File Upload: Finished", "MemberListing");
                 auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, author, "File uploaded: " + ctlFileUpload.PostedFile.FileName, "MemberListing");
                 Utility.RegisterStartupScriptHandling(this, "Success", "alert('File uploaded successfully');", true, true, author);
@@ -398,13 +362,8 @@ namespace EPP.CorporatePortal.Application
                 auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Error, userName, errMsg, "MemberListing");
         }
 
-        private void LoadUploadHistory(string userName, string corpId)
+        private void LoadUploadHistory(string userName, string corpId,string UCorporateId)
         {
-            //var user = HttpContext.Current.User as ClaimsPrincipal;
-            //var identity = user.Identity as ClaimsIdentity;
-            //var bizRegNo = identity.Claims.Where(c => c.Type == "BusinessRegistrationNo").Select(c => c.Value).SingleOrDefault();
-            var bizRegNo = ((CorporatePortalSite)this.Master)._UserIdentityModel.BusinessRegistrationNo;
-
             auditTrailService.LogAuditTrail(DateTime.Now, Common.Enums.AuditType.Info, userName, "LoadUploadHistory: Started", "MemberListing");
 
             var service = new StoredProcService(userName);
@@ -435,21 +394,16 @@ namespace EPP.CorporatePortal.Application
             var decryptedCorpId = Utility.EncodeAndDecryptCorpId(corpId);
             DataTable dt = service.GetFileUpload(decryptedCorpId);
 
-            //if (dt.Rows.Count > 0)
-            //{
-            //    //Filter FileUpload lists to only those user has access to. PIC/Owner only
-            //    var policies = CommonEntities.LoadPolicies(bizRegNo, ((CorporatePortalSite)this.Master)._UserIdentityModel.PrincipalName, ((CorporatePortalSite)this.Master)._UserIdentityModel.IsOwner);
-            //    var policyList = policies.AsEnumerable().Select(s => s["ContractNo"].ToString()).Distinct().ToList();
-            //    var dtFiltered = dt.AsEnumerable().Where(w => policyList.Contains(w["PolicySourceId"].ToString()));
-
-            //    if (dtFiltered.Any())
-            //        dt = dtFiltered.CopyToDataTable();
-            //    else
-            //        dt = new DataTable();
-            //}
-
             //Update UploadHistory data with new ExceptionLink column
             dt = UpdateUploadHistoryLinks(dt, remoteRPAExceptionPath, remoteCGLSExceptionPath, remoteInvoicePath, userName);
+
+            dt.Columns.Add("UCorpId", typeof(System.String));
+
+            foreach (DataRow row in dt.Rows)
+            {
+                row["UCorpId"] = UCorporateId;   
+            }
+
 
             rptFileUploadHistory.DataSource = dt;
             rptFileUploadHistory.DataBind();
